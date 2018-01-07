@@ -1,0 +1,9 @@
+{% if latest_txn_list %}
+    <ul>
+    {% for transaction in latest_txn_list %}
+        <li><a href="{% url 'expenses:detail'  transaction.id%}">{{ transaction.txn_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No transactions are available.</p>
+{% endif %}
