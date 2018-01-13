@@ -6,10 +6,14 @@ app_name = 'expenses'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    # ex: /polls/5/
+    path('add_txn', views.add_txn, name='add_txn'),
+
+    #TODO what is name convention for post path?
+    path('add_txn_post', views.add_txn_post, name='add_txn_post'),
+    path('add_txn_file_post', views.add_txn_file_post, name='add_txn_file_post'),
+
+    # ex: /expenses/5/
     path('<int:txn_id>/', views.detail, name='detail'),
-    # ex: /polls/5/results/
-    path('<int:txn_id>/results/', views.results, name='results'),
-    # ex: /polls/5/vote/
-    path('<int:txn_id>/vote/', views.vote, name='vote'),
+    # ex: /expenses/5/edit_txn/
+    path('<int:txn_id>/edit_txn/', views.edit_txn, name='edit_txn'),
 ]

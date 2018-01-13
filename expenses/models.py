@@ -1,22 +1,32 @@
 from django.db import models
 
 
+class Category(models.Model):
+    text = models.CharField(max_length=200)
+    def __str__(self):
+        return self.text
+
+
+class SubCategory(models.Model):
+    text = models.CharField(max_length=200)
+    catagory = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.text
+
+
 class Transaction(models.Model):
-    txn_text = models.CharField(max_length=200)
-    txn_date = models.DateTimeField('Transaction date')
-    txn_tag = models.CharField(max_length=200)
-    txn_amount = models.CharField(max_length=200)
+    comment = models.CharField(max_length=200)
+    merchant = models.CharField(max_length=200)
+    date = models.DateField('Transaction date')
+    amount = models.CharField(max_length=200)
+    source = models.CharField(max_length=200)
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True)
+
     def __str__(self):
-        return self.txn_text
+        return self.merchant
 
 
-class Choice(models.Model):
-    question = models.ForeignKey(Transaction, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
-    def __str__(self):
-        return self.choice_text
-
-
-
-
+class KnownKeyWords(models.Model):
+    txn_text_contains = models.CharField(max_length=200)
+    subCatagory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)

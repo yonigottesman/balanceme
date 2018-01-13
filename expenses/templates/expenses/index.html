@@ -1,9 +1,37 @@
+{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
+
 {% if latest_txn_list %}
-    <ul>
-    {% for transaction in latest_txn_list %}
-        <li><a href="{% url 'expenses:detail'  transaction.id%}">{{ transaction.txn_text }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No transactions are available.</p>
-{% endif %}
+<!-- TODO use this https://docs.djangoproject.com/en/2.0/topics/pagination/ -->
+<div class="container">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Merchant</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Comment</th>
+        <th scope="col">Subcategory</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for transaction in latest_txn_list %}    
+      <tr>
+        <td>{{ transaction.date }}</td>
+        <td>{{ transaction.merchant }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.comment }}</td>
+        <td>{{ transaction.sucategory }}</td>
+      </tr>
+      {% endfor %}
+
+    </tbody>
+  </table>
+  {% else %}
+  <p>No transactions are available.</p>
+  {% endif %}
+  
+</div>
+
+
+

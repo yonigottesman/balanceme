@@ -1,5 +1,15 @@
+{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
+
 <h1>{{ transaction.txn_text }}</h1>
-<ul>
-    <p>{{transaction.txn_date}}</p>
-    <p>{{transaction.txn_tag}}</p>
-</ul>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+
+<form action="{% url 'expenses:edit_txn' transaction.id %}" method="post">
+{% csrf_token %}
+      <select name="SubCatagory">
+          {% for sc in subCatagories %}
+          <option value="{{sc.id}}">{{sc.text}}</option>
+          {% endfor %}
+      </select>
+<input type="submit" value="Save" />
+</form>
