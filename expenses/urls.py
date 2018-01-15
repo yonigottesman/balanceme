@@ -7,6 +7,7 @@ app_name = 'expenses'
 urlpatterns = [
     path('', views.index, name='index'),
     path('add_txn', views.add_txn, name='add_txn'),
+    path('stats', views.stats, name='stats'),
 
     #TODO what is name convention for post path?
     path('add_txn_post', views.add_txn_post, name='add_txn_post'),

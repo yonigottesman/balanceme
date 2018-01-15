@@ -19,7 +19,7 @@ class Transaction(models.Model):
     comment = models.CharField(max_length=200)
     merchant = models.CharField(max_length=200)
     date = models.DateField('Transaction date')
-    amount = models.CharField(max_length=200)
+    amount = models.FloatField()
     source = models.CharField(max_length=200)
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True)
 

@@ -1,17 +1,27 @@
+import pygal as pygal
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Transaction, SubCategory
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 import dateutil.parser
 from .parsers.abstract import FileParser
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import datetime
+from django.db.models import Sum
+
 
 def index(request):
-    latest_txn_list = Transaction.objects.order_by('-date')[:50]
-    context = { 'latest_txn_list': latest_txn_list, }
+    transaction_list = Transaction.objects.order_by('-date')
+    paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
+    page = request.GET.get('page')
+    transactions = paginator.get_page(page)
+    context = {'transactions':  transactions}
     return render(request, 'expenses/index.html', context)
+
 
 def add_txn(request):
     return render(request, 'expenses/add.html', {'subcategories':SubCategory.objects.all()})
+
 
 def add_txn_post(request):
     try:
@@ -48,6 +58,7 @@ def detail(request, txn_id):
     return render(request, 'expenses/detail.html', {'transaction': transaction,
                                                     'subCatagories':SubCategory.objects.all()})
 
+
 def edit_txn(request, txn_id):
     transaction = get_object_or_404(Transaction, pk=txn_id)
     try:
@@ -62,3 +73,22 @@ def edit_txn(request, txn_id):
         transaction.save()
         return HttpResponseRedirect(reverse('expenses:index'))
 
+
+def stats(request):
+
+    date_list = [datetime.date.today() - dateutil.relativedelta.relativedelta(months=x) for x in range(11, -1, -1)]
+
+    sum_list = []
+    for date in date_list:
+        sum_list.append(Transaction.objects.filter(date__year=date.year, date__month=date.month).aggregate(Sum('amount'))['amount__sum'])
+
+    str_month_list = [datetime.date.strftime(x, '%b %Y') for x in date_list]
+
+    line_chart = pygal.Bar()
+    line_chart.x_labels = str_month_list
+    line_chart.add('amount', sum_list)
+
+    chart = line_chart.render_data_uri()
+    context = {'chart': chart}
+
+    return render(request, 'expenses/stats.html', context)

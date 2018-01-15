@@ -1,0 +1,10 @@
+{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
+
+
+<div class="container">
+  <div id="chart">
+    <embed type="image/svg+xml" src= {{ chart|safe }} />
+  </div>
+</div>
+
+{{months}}

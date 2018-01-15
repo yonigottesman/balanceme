@@ -21,7 +21,10 @@ class VisaCalParser(FileParser):
             return None
 
         merchant = line.split("\t")[1]
-        amount = line.split("\t")[3].split("₪")[0]
+        amount = line.split("\t")[3].split("₪")[0].replace(',','')
+        if '-' in amount:
+            amount = '-' + amount.replace('-','')
+
         comment = ""
         if len(line.split("\t")) == 5:
             comment = line.split("\t")[4]
