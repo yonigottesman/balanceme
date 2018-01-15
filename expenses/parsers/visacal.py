@@ -2,6 +2,7 @@ from expenses.models import Transaction
 from .abstract import FileParser
 import dateutil.parser
 
+
 class VisaCalParser(FileParser):
 
     def get_date(self, str):
@@ -41,3 +42,16 @@ class VisaCalParser(FileParser):
                 transactions.append(transaction)
 
         return transactions
+
+
+def is_visacal(file):
+    decoded_file = file.decode('utf-16')
+    if 'פירוט עסקות נכון לתאריך' not in decoded_file:
+        return False
+    if 'לכרטיס ויזה' not in decoded_file:
+        return False
+    if 'המסתיים בספרות' not in decoded_file:
+        return False
+    return True
+
+
