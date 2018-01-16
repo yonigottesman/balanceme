@@ -6,6 +6,7 @@ app_name = 'expenses'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('filter_index', views.filter_index, name='filter_index'),
     path('add_txn', views.add_txn, name='add_txn'),
     path('stats', views.stats, name='stats'),
 

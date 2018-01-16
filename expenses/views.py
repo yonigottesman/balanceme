@@ -10,17 +10,39 @@ import datetime
 from django.db.models import Sum
 
 
+def filter_index(request):
+    try:
+        startDate = request.POST['startDate']
+        endDate = request.POST['endDate']
+    except KeyError:
+        # Redisplay the transaction voting form.
+        return render(request, 'expenses/index.html', {})
+    else:
+        url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate
+        return HttpResponseRedirect(url)
+
+
 def index(request):
-    transaction_list = Transaction.objects.order_by('-date')
+    start_date = request.GET.get('startDate')
+    end_date = request.GET.get('endDate')
+    # transaction_list = []
+    if (start_date is None or end_date is None) or (start_date == 'None' or end_date == 'None'):
+        transaction_list = Transaction.objects.order_by('-date')
+    else:
+        transaction_list = Transaction.objects.filter(date__range=[start_date, end_date]).order_by('-date')  # year-month-day
+
+    # transaction_list = Transaction.objects.order_by('-date')
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
     page = request.GET.get('page')
     transactions = paginator.get_page(page)
-    context = {'transactions':  transactions}
+    context = {'transactions':  transactions,
+               'startDate': start_date, 'endDate': end_date}
+
     return render(request, 'expenses/index.html', context)
 
 
 def add_txn(request):
-    return render(request, 'expenses/add.html', {'subcategories':SubCategory.objects.all()})
+    return render(request, 'expenses/add.html', {'subcategories': SubCategory.objects.all()})
 
 
 def add_txn_post(request):
