@@ -14,22 +14,33 @@ def filter_index(request):
     try:
         startDate = request.POST['startDate']
         endDate = request.POST['endDate']
+        source = request.POST['source']
     except KeyError:
         # Redisplay the transaction voting form.
         return render(request, 'expenses/index.html', {})
     else:
-        url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate
+        url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate + '&source='+source
         return HttpResponseRedirect(url)
 
 
 def index(request):
     start_date = request.GET.get('startDate')
     end_date = request.GET.get('endDate')
+    source = request.GET.get('source')
+    end_date_input_value = str(datetime.date.today())
+    start_date_input_value = str((datetime.date.today() - datetime.timedelta(31)).replace(day=1))
     # transaction_list = []
     if (start_date is None or end_date is None) or (start_date == 'None' or end_date == 'None'):
         transaction_list = Transaction.objects.order_by('-date')
+
     else:
+        start_date_input_value = start_date
+        end_date_input_value = end_date
         transaction_list = Transaction.objects.filter(date__range=[start_date, end_date]).order_by('-date')  # year-month-day
+
+    if source != "all" and source != "None" and source != None:
+        transaction_list = transaction_list.filter(source_id=int(source))
+
 
     # transaction_list = Transaction.objects.order_by('-date')
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
@@ -38,7 +49,10 @@ def index(request):
     input_source_list = InputSource.objects.all()
     context = {'transactions':  transactions,
                'startDate': start_date, 'endDate': end_date,
-               'inputSources': input_source_list}
+               'inputSources': input_source_list,
+               'startDateValue': start_date_input_value,
+               'endDateValue': end_date_input_value,
+               'source': source}
 
     return render(request, 'expenses/index.html', context)
 
