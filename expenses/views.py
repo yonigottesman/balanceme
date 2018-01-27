@@ -1,11 +1,11 @@
 import pygal as pygal
-from django.http import HttpResponse, HttpResponseRedirect
-from .models import Transaction, SubCategory
+from django.http import HttpResponseRedirect
+from .models import Transaction, SubCategory, InputSource
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 import dateutil.parser
-from .parsers.abstract import FileParser
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .parsers.abstract import FileParser, remove_existing
+from django.core.paginator import Paginator
 import datetime
 from django.db.models import Sum
 
@@ -35,8 +35,10 @@ def index(request):
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
     page = request.GET.get('page')
     transactions = paginator.get_page(page)
+    input_source_list = InputSource.objects.all()
     context = {'transactions':  transactions,
-               'startDate': start_date, 'endDate': end_date}
+               'startDate': start_date, 'endDate': end_date,
+               'inputSources': input_source_list}
 
     return render(request, 'expenses/index.html', context)
 
@@ -46,6 +48,7 @@ def add_txn(request):
 
 
 def add_txn_post(request):
+    return render(request, 'expenses/add.html', {'error_message': "Not Supported",})
     try:
         text = request.POST['text']
         date = request.POST['date']
@@ -63,13 +66,16 @@ def add_txn_post(request):
 
 def add_txn_file_post(request):
     try:
-        uploaded_file = request.FILES['txns_file'].read()
+        uploaded_file = request.FILES['txns_file']
     except (KeyError, SubCategory.DoesNotExist):
         # Redisplay the transaction voting form.
         return render(request, 'expenses/add.html', { 'error_message': "All fields mandatory",})
     else:
-        parser = FileParser.factory(uploaded_file)
+        parser = FileParser().factory(uploaded_file)
+        if parser is None:
+            return render(request, 'expenses/add.html', {'error_message': "Unknown file format",})
         transactions = parser.get_transactions(uploaded_file)
+        transactions = remove_existing(transactions)
         for txn in transactions:
             txn.save()
         return HttpResponseRedirect(reverse('expenses:index'))

@@ -1,21 +1,51 @@
-
+from expenses.models import InputSource, Transaction
 
 
 class FileParser(object):
 
-    def factory(file):
-        #TODO do something with this circular imports, whats the best practice here?
-        from .visacal import VisaCalParser, is_visacal
+    def __init__(self):
+        from .visacal import VisaCalParser
+        from .poalimbank import PoalimBankParser
 
-        if is_visacal(file):
-            return VisaCalParser()
+        self.parsers = [VisaCalParser(), PoalimBankParser()]
 
-    factory = staticmethod(factory)
+    def factory(self, file):
 
-    #TODO make this abstract
-    def get_transactions(self):
-        pass
+        for parser in self.parsers:
+            file.file.seek(0)
+            if parser.is_me(file):
+                file.file.seek(0)
+                return parser
+
+        return None
 
 
+def get_add_source(source_type_name, source_type_id):
+    try:
+        source = InputSource.objects.get(type_name=source_type_name, type_id=source_type_id)
+    except InputSource.DoesNotExist:
+        source = InputSource(type_name=str(source_type_name), type_id=str(source_type_id))
+        source.save()
+
+    return source
 
 
+# TODO check efficiency of this function
+def remove_existing(new_transactions):
+    if len(new_transactions) is 0:
+        return new_transactions
+
+    without_duplicates = []
+    for transaction in new_transactions:
+
+        found = Transaction.objects\
+            .filter(comment=transaction.comment)\
+            .filter(merchant=transaction.merchant)\
+            .filter(amount=transaction.amount)\
+            .filter(source=transaction.source)\
+            .filter(date=transaction.date)
+
+        if len(found) == 0:
+            without_duplicates.append(transaction)
+
+    return without_duplicates

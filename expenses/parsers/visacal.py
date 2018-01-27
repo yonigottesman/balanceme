@@ -1,9 +1,10 @@
-from expenses.models import Transaction
-from .abstract import FileParser
+from expenses.models import Transaction, InputSource
 import dateutil.parser
 
+from expenses.parsers.abstract import get_add_source
 
-class VisaCalParser(FileParser):
+
+class VisaCalParser(object):
 
     def get_date(self, str):
         try:
@@ -34,8 +35,10 @@ class VisaCalParser(FileParser):
 
     def get_transactions(self, file):
         transactions = []
-        decoded_file = file.decode('utf-16')
-        source = "visa " + decoded_file.split("\n")[1].split("המסתיים בספרות")[1].split(",")[0]
+        decoded_file = file.read().decode('utf-16')
+        source_type = "visa"
+        source_type_id = str(decoded_file.split("\n")[1].split("המסתיים בספרות")[1].split(",")[0])
+        source = get_add_source(source_type_name=source_type, source_type_id=source_type_id)
         for line in decoded_file.split('\n'):
             transaction = self.parse_transaction(line, source=source)
             if transaction != None:
@@ -43,15 +46,17 @@ class VisaCalParser(FileParser):
 
         return transactions
 
-
-def is_visacal(file):
-    decoded_file = file.decode('utf-16')
-    if 'פירוט עסקות נכון לתאריך' not in decoded_file:
-        return False
-    if 'לכרטיס ויזה' not in decoded_file:
-        return False
-    if 'המסתיים בספרות' not in decoded_file:
-        return False
-    return True
+    def is_me(self, file):
+        try:
+            decoded_file = file.read().decode('utf-16')
+        except Exception:  # TODO catch decode error and not all
+            return False
+        if 'פירוט עסקות נכון לתאריך' not in decoded_file:
+            return False
+        if 'לכרטיס ויזה' not in decoded_file:
+            return False
+        if 'המסתיים בספרות' not in decoded_file:
+            return False
+        return True
 
 
