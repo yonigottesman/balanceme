@@ -1,4 +1,5 @@
 import pygal as pygal
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from .models import Transaction, SubCategory, InputSource
 from django.shortcuts import render, get_object_or_404
@@ -6,42 +7,49 @@ from django.urls import reverse
 import dateutil.parser
 from .parsers.abstract import FileParser, remove_existing
 from django.core.paginator import Paginator
-import datetime
 from django.db.models import Sum
-
+from datetime import datetime
 
 def filter_index(request):
     try:
         startDate = request.POST['startDate']
         endDate = request.POST['endDate']
         source = request.POST['source']
+        search = request.POST['search']
     except KeyError:
         # Redisplay the transaction voting form.
         return render(request, 'expenses/index.html', {})
     else:
-        url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate + '&source='+source
+        url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate + '&source='+source\
+              + '&search='+search
         return HttpResponseRedirect(url)
+
+
+def get_datetime(date_str):
+    try:
+        date = datetime.strptime(date_str, '%Y-%m-%d')
+    except (ValueError, TypeError) as e:
+        return None
+    else:
+        return date
 
 
 def index(request):
     start_date = request.GET.get('startDate')
     end_date = request.GET.get('endDate')
     source = request.GET.get('source')
-    end_date_input_value = str(datetime.date.today())
-    start_date_input_value = str((datetime.date.today() - datetime.timedelta(31)).replace(day=1))
-    # transaction_list = []
-    if (start_date is None or end_date is None) or (start_date == 'None' or end_date == 'None'):
-        transaction_list = Transaction.objects.order_by('-date')
+    search = request.GET.get('search')
+    transaction_list = Transaction.objects
 
-    else:
-        start_date_input_value = start_date
-        end_date_input_value = end_date
-        transaction_list = Transaction.objects.filter(date__range=[start_date, end_date]).order_by('-date')  # year-month-day
-
-    if source != "all" and source != "None" and source != None:
+    if get_datetime(start_date) is not None:
+        transaction_list = transaction_list.filter(date__gte=get_datetime(start_date))
+    if get_datetime(end_date) is not None:
+        transaction_list = transaction_list.filter(date__lte=get_datetime(end_date))
+    if source != "all" and source != "None" and source is not None:
         transaction_list = transaction_list.filter(source_id=int(source))
-
-
+    if search != '' and search is not None:
+        transaction_list = transaction_list.filter(Q(merchant__icontains=search) | Q(comment__icontains=search))
+    transaction_list = transaction_list.order_by('-date')
     # transaction_list = Transaction.objects.order_by('-date')
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
     page = request.GET.get('page')
@@ -50,9 +58,8 @@ def index(request):
     context = {'transactions':  transactions,
                'startDate': start_date, 'endDate': end_date,
                'inputSources': input_source_list,
-               'startDateValue': start_date_input_value,
-               'endDateValue': end_date_input_value,
-               'source': source}
+               'source': source,
+               'search': search}
 
     return render(request, 'expenses/index.html', context)
 
@@ -118,13 +125,13 @@ def edit_txn(request, txn_id):
 
 def stats(request):
 
-    date_list = [datetime.date.today() - dateutil.relativedelta.relativedelta(months=x) for x in range(11, -1, -1)]
+    date_list = [datetime.today() - dateutil.relativedelta.relativedelta(months=x) for x in range(11, -1, -1)]
 
     sum_list = []
     for date in date_list:
         sum_list.append(Transaction.objects.filter(date__year=date.year, date__month=date.month).aggregate(Sum('amount'))['amount__sum'])
 
-    str_month_list = [datetime.date.strftime(x, '%b %Y') for x in date_list]
+    str_month_list = [datetime.strftime(x, '%b %Y') for x in date_list]
 
     line_chart = pygal.Bar()
     line_chart.x_labels = str_month_list

@@ -3,33 +3,45 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'expenses/style.css' %}" />
 
-<div class="container">
+<div class="container border">
   <form action="{% url 'expenses:filter_index' %}" method="post">
     {% csrf_token %}
     <div class="form-row">
 
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-3">
         <label for="date">Start Date</label>
-        <input type="date" class="form-control" id="startDate" name="startDate" value="{{startDateValue}}">
+        <input type="date" class="form-control" id="startDate" name="startDate" value="{{startDate}}">
       </div>
 
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-3">
         <label for="date">End Date</label>
-        <input type="date" class="form-control" id="endDate" name="endDate" value="{{endDateValue}}">
+        <input type="date" class="form-control" id="endDate" name="endDate" value="{{endDate}}">
       </div>
 
 
-      <div class="form-group col-md-4">
+      <div class="form-group col-md-3">
         <label for="inputSource">Source</label>
         <select id="source" class="form-control" name="source">
+          
           <option value="all">All</option>
+          
           {% for source in inputSources %}
-
-          <option value="{{source.id}}"> {{ source }}</option>
-
+          <option  value="{{source.id}}"> {{ source }}</option>
           {% endfor %}
-
         </select>
+      </div>
+
+      <div class="form-group col-md-3">
+
+        <label for="search">Contains Text</label>
+        <div class="input-group mb-2">
+          {% if search %}          
+          <input type="text" class="form-control" id="search" name="search" value="{{search}}">
+          {% else %}
+          <input type="text" class="form-control" id="search" name="search">
+          {% endif %}
+        </div>
+
       </div>
 
 
@@ -51,7 +63,8 @@
     <input name="startDate" type="hidden" value="{{startDate}}" />
     <input name="endDate" type="hidden" value="{{endDate}}" />
     <input name="source" type="hidden" value="{{source}}" />
-    
+    <input name="search" type="hidden" value="{{search}}" />
+
     <div class="form-row">
       <div class="actions">
         <label>Action: <select name="action" required="">
@@ -130,11 +143,11 @@
       {% if transactions.has_previous %}
 
       <li class="page-item">
-        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}" tabindex="-1">First</a>
+        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}" tabindex="-1">First</a>
       </li>
       
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}" tabindex="-1">Previous</a>
+        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}" tabindex="-1">Previous</a>
       </li>
 
       {% else %}
@@ -150,11 +163,11 @@
       
       {% if transactions.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}">Next</a>
+        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}">Next</a>
       </li>
 
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}">Last</a>
+        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}">Last</a>
       </li>
       
       {% else %}
