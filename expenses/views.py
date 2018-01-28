@@ -134,3 +134,18 @@ def stats(request):
     context = {'chart': chart}
 
     return render(request, 'expenses/stats.html', context)
+
+
+def index_action(request):
+    marked_transactions = request.POST.getlist('marked_checkbox')
+    startDate = request.POST['startDate']
+    endDate = request.POST['endDate']
+    source = request.POST['source']
+
+    if request.POST['action'] == 'delete':
+        for marked in marked_transactions:
+            transaction = Transaction.objects.get(pk=marked)
+            transaction.delete()
+    url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate + '&source=' + source
+    return HttpResponseRedirect(url)
+    return HttpResponseRedirect(reverse('expenses:index'))

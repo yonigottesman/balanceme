@@ -1,5 +1,8 @@
 {% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'expenses/style.css' %}" />
+
 <div class="container">
   <form action="{% url 'expenses:filter_index' %}" method="post">
     {% csrf_token %}
@@ -36,39 +39,83 @@
   </form>
 </div>
 
+
+
+
 {% if transactions %}
-<div class="container">
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Date</th>
-        <th scope="col">Merchant</th>
-        <th scope="col">Amount</th>
-        <th scope="col">Comment</th>
-        <th scope="col">Subcategory</th>
-        <th scope="col">Source</th>
-      </tr>
-    </thead>
-    <tbody>
-
-      {% for transaction in transactions %}    
-      <tr>
-        <td>{{ transaction.date }}</td>
-        <td>{{ transaction.merchant }}</td>
-        <td>{{ transaction.amount }}</td>
-        <td>{{ transaction.comment }}</td>
-        <td>{{ transaction.sucategory }}</td>
-        <td>{{ transaction.source }}</td>
-      </tr>
-      {% endfor %}
-
-    </tbody>
-  </table>
-  {% else %}
-  <p>No transactions are available.</p>
-  {% endif %}
+<div class="container border">
   
+  <form action="{% url 'expenses:index_action' %}" method="post">
+    {% csrf_token %}
+
+    <input name="startDate" type="hidden" value="{{startDate}}" />
+    <input name="endDate" type="hidden" value="{{endDate}}" />
+    <input name="source" type="hidden" value="{{source}}" />
+    
+    <div class="form-row">
+      <div class="actions">
+        <label>Action: <select name="action" required="">
+            <option value="" selected="">---------</option>
+            <option value="delete">Delete selected</option>
+          </select>
+        </label>
+        <button type="submit" class="button" title="Run the selected action" name="index" value="0">Go</button>
+      </div>
+    </div>
+
+    <div class="row justify-content-md-center ">
+
+      <script language="JavaScript">
+        function toggle(source) {
+        checkboxes = document.getElementsByName('marked_checkbox');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+                                                  checkboxes[i].checked = source.checked;                                            
+                                                  }
+                                                  }
+                                                  </script>
+      
+      <table class="table">
+        <thead>
+          <tr>
+
+            <th><input type="checkbox" onClick="toggle(this)" /></th>
+            <th scope="col">Date</th>
+            <th scope="col">Merchant</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Comment</th>
+            <th scope="col">Subcategory</th>
+            <th scope="col">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for transaction in transactions %}    
+          <tr>
+            <td><input type="checkbox" value="{{ transaction.id }}" name="marked_checkbox"></td>
+            <td>{{ transaction.date }}</td>
+            <td>{{ transaction.merchant }}</td>
+            <td>{{ transaction.amount }} ₪</td>
+            <td>{{ transaction.comment }}</td>
+            <td>{{ transaction.sucategory }}</td>
+            <td>{{ transaction.source }}</td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
 </div>
+
+
+
+</form>  
+
+
+{% else %}
+<p>No transactions are available.</p>
+{% endif %}
+
+
 
 
 
