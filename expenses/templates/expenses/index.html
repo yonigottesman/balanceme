@@ -105,7 +105,11 @@
             <td>{{ transaction.merchant }}</td>
             <td>{{ transaction.amount }} ₪</td>
             <td>{{ transaction.comment }}</td>
-            <td>{{ transaction.sucategory }}</td>
+            {% if transaction.subcategory%}
+            <td>{{ transaction.subcategory }}</td>
+            {% else %}
+            <td></td>
+            {% endif%}
             <td>{{ transaction.source }}</td>
           </tr>
           {% endfor %}

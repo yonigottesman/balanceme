@@ -1,25 +1,94 @@
 {% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
 <div class="container border">
-  <div class="form-row ">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Type</th>
-          <th scope="col">value</th>
-          <th scope="col">Sub Category</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for rule in rules %}    
-        <tr>
-          <td>{{rule.rule_type}}</td>
-          <td>{{rule.value}}</td>
-          <td>{{rule.subCategory}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  
+  <div class="border">
+    <form  action="{% url 'expenses:rules_add' %}" method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        
+        <div class="form-group col-md-4">
+          <label for="subcategory">Rule Type</label>
+          <select id="rule_type_id" class="form-control" name="rule_type_id" required="">
+            <option value="" selected="">---------</option>
+            {% for rt in rule_types %}
+            <option value="{{rt.id}}"> {{ rt }}</option>
+            {% endfor %}
+          </select>          
+        </div>
+        
+        <div class="form-group col-md-4">
+          <label for="text">Value</label>
+          <input type="text" class="form-control" id="value" placeholder="Free text" name="value" required="">
+        </div>
+        
+        <div class="form-group col-md-4">
+          <label for="subcategory">Sub Category</label>
+          <select id="subcategory" class="form-control" name="subcategory_id" required="">
+            <option value="" selected="">---------</option>
+            {% for sc in subcategories %}
+            <option value="{{sc.id}}"> {{ sc.text }}</option>
+            {% endfor %}
+          </select>          
+        </div>
+        
 
+      </div>
+      
+      <button type="add" class="btn btn-primary">Add</button>      
+    </form>
+  </div>
+  
+  <div class="container  border">
+    <form action="{% url 'expenses:rules_action' %}" method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="actions">
+          <label>Action: <select name="action" required="">
+              <option value="" selected="">---------</option>
+              <option value="apply">Apply Rules</option>
+              <option value="delete">Delete selected</option>
+            </select>
+          </label>
+          <button type="submit" class="button" title="Run the selected action" name="index" value="0">Go</button>
+        </div>
+      </div>
+
+      <table class="table">
+        <col width="40">
+        <thead>
+          <tr>
+            <th><input type="checkbox" onClick="toggle(this, 'marked_checkbox')" /></th>
+            <th scope="col">Type</th>
+            <th scope="col">value</th>
+            <th scope="col">Sub Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rule in rules %}    
+          <tr>
+            <td><input type="checkbox" value="{{ rule.id }}" name="marked_checkbox"></td>
+            <td>{{rule.rule_type}}</td>
+            <td>{{rule.value}}</td>
+            <td>{{rule.subCategory}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      
+    </form>
+    
+    
   </div>
 </div>
+
+<script language="JavaScript">
+    function toggle(source, name) {
+        checkboxes = document.getElementsByName(name);
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;                                            
+        }
+    }
+</script>
+      

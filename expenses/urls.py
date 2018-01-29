@@ -25,4 +25,6 @@ urlpatterns = [
     path('categories_action', views.categories_action, name='categories_action'),
     path('sub_categories_action', views.sub_categories_action, name='sub_categories_action'),
     path('rules', views.rules, name='rules'),
+    path('rules_add', views.rules_add, name='rules_add'),
+    path('rules_action', views.rules_action, name='rules_action'),
 ]
