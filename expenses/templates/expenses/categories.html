@@ -6,7 +6,7 @@
   <div class="form-row">
 
     <!-- Category -->
-    <div class="form-group col-md-6 border">
+    <div class="form-group col-md-6 ">
       <form class="form-inline" action="{% url 'expenses:categories_add' %}" method="post">
         {% csrf_token %}
         <input type="text" class="form-control" id="text" placeholder="New Category" name="text">
@@ -14,7 +14,7 @@
       </form>
 
       
-      <div class="container border">
+      <div class="container ">
         <form action="{% url 'expenses:categories_action' %}" method="post">
           {% csrf_token %}
           <div class="form-row">
@@ -52,7 +52,7 @@
     </div>
     
     <!-- Sub Category -->
-    <div class="form-group col-md-6 border">
+    <div class="form-group col-md-6 ">
 
       <form class="form-inline" action="{% url 'expenses:sub_categories_add' %}" method="post">
         {% csrf_token %}
@@ -68,7 +68,7 @@
       </form>
 
 
-      <div class="container border">
+      <div class="container ">
         <form action="{% url 'expenses:sub_categories_action' %}" method="post">
           {% csrf_token %}
           <div class="form-row">
@@ -83,7 +83,7 @@
           </div>
 
       <table class="table">
-        <col width="40">
+         <col width="40">
         <thead>
           <tr>
             <th><input type="checkbox" onClick="toggle_c(this,'marked_checkbox_sub')" /></th>

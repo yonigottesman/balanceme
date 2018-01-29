@@ -1,8 +1,8 @@
 {% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
-<div class="container border">
+<div class="container ">
   
-  <div class="border">
+  <div class="">
     <form  action="{% url 'expenses:rules_add' %}" method="post">
       {% csrf_token %}
       <div class="form-row">
@@ -39,7 +39,7 @@
     </form>
   </div>
   
-  <div class="container  border">
+  <div class="container  ">
     <form action="{% url 'expenses:rules_action' %}" method="post">
       {% csrf_token %}
       <div class="form-row">

@@ -3,7 +3,7 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'expenses/style.css' %}" />
 
-<div class="container border">
+<div class="container ">
   <form action="{% url 'expenses:filter_index' %}" method="post">
     {% csrf_token %}
     <div class="form-row">
@@ -51,7 +51,7 @@
 
 
 {% if transactions %}
-<div class="container border">
+<div class="container  ">
   
   <form action="{% url 'expenses:index_action' %}" method="post">
     {% csrf_token %}
@@ -61,7 +61,7 @@
     <input name="source" type="hidden" value="{{source}}" />
     <input name="search" type="hidden" value="{{search}}" />
 
-    <div class="form-row">
+    <div class="row">
       <div class="actions">
         <label>Action: <select name="action" required="">
             <option value="" selected="">---------</option>
@@ -72,17 +72,7 @@
       </div>
     </div>
 
-    <div class="row justify-content-md-center ">
-      
-      <script language="JavaScript">
-        function toggle(source) {
-            checkboxes = document.getElementsByName('marked_checkbox');
-            for(var i=0, n=checkboxes.length;i<n;i++) {
-                checkboxes[i].checked = source.checked;                                            
-            }
-        }
-      </script>
-
+    <div class="row  ">
       <table class="table">
         <thead>
           <tr>
@@ -117,11 +107,9 @@
         </tbody>
       </table>
     </div>
+  </form>  
 </div>
 
-
-
-</form>  
 
 
 {% else %}
@@ -186,3 +174,12 @@
   </nav>
   
 </div>
+
+<script language="JavaScript">
+    function toggle(source) {
+        checkboxes = document.getElementsByName('marked_checkbox');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = source.checked;                                            
+        }
+    }
+</script>
