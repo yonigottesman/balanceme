@@ -1,7 +1,7 @@
 import pygal as pygal
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from .models import Transaction, SubCategory, InputSource
+from .models import Transaction, SubCategory, InputSource, Category, Rule
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 import dateutil.parser
@@ -47,10 +47,10 @@ def index(request):
         transaction_list = transaction_list.filter(date__lte=get_datetime(end_date))
     if source != "all" and source != "None" and source is not None:
         transaction_list = transaction_list.filter(source_id=int(source))
-    if search != '' and search is not None:
+    if search != '' and search is not None and search != 'None':
         transaction_list = transaction_list.filter(Q(merchant__icontains=search) | Q(comment__icontains=search))
     transaction_list = transaction_list.order_by('-date')
-    # transaction_list = Transaction.objects.order_by('-date')
+
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
     page = request.GET.get('page')
     transactions = paginator.get_page(page)
@@ -118,7 +118,7 @@ def edit_txn(request, txn_id):
             'transaction': transaction,
             'error_message': "You didn't select a choice.", })
     else:
-        transaction.subcatagory = SubCategory.objects.get(pk=selected_subCatagory_id)
+        transaction.subcategory = SubCategory.objects.get(pk=selected_subCatagory_id)
         transaction.save()
         return HttpResponseRedirect(reverse('expenses:index'))
 
@@ -155,4 +155,65 @@ def index_action(request):
             transaction.delete()
     url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate + '&source=' + source
     return HttpResponseRedirect(url)
-    return HttpResponseRedirect(reverse('expenses:index'))
+
+
+def categories(request):
+    sub_categories = SubCategory.objects.all()
+    categories = Category.objects.all()
+    context = {
+        'sub_categories': sub_categories,
+        'categories': categories
+    }
+
+    return render(request, 'expenses/categories.html', context)
+
+
+def categories_add(request):
+    try:
+        text = request.POST['text']
+    except (KeyError):
+        # Redisplay the transaction voting form.
+        return render(request, 'expenses/categories', { 'error_message': "All fields mandatory",})
+    else:
+        if text != '':
+            category = Category(text=text)
+            category.save()
+        return HttpResponseRedirect(reverse('expenses:categories'))
+
+
+def sub_categories_add(request):
+    try:
+        text = request.POST['text']
+        category_id = request.POST['category_id']
+        category = Category.objects.get(pk=category_id)
+    except (KeyError, Category.DoesNotExist):
+        # Redisplay the transaction voting form.
+        return render(request, 'expenses/categories', { 'error_message': "All fields mandatory",})
+    else:
+        if text != '':
+            sub_category = SubCategory(text=text, category=category)
+            sub_category.save()
+        return HttpResponseRedirect(reverse('expenses:categories'))
+
+
+def rules(request):
+    rules = Rule.objects.all()
+    context = {'rules': rules}
+    return render(request, 'expenses/rules.html', context)
+
+
+def categories_action(request):
+    marked_categories = request.POST.getlist('marked_checkbox')
+    if request.POST['action'] == 'delete':
+        for marked in marked_categories:
+            category = Category.objects.get(pk=marked)
+            category.delete()
+    return HttpResponseRedirect(reverse('expenses:categories'))
+
+def sub_categories_action(request):
+    marked_sub_categories = request.POST.getlist('marked_checkbox_sub')
+    if request.POST['action'] == 'delete':
+        for marked in marked_sub_categories:
+            sub_category = SubCategory.objects.get(pk=marked)
+            sub_category.delete()
+    return HttpResponseRedirect(reverse('expenses:categories'))

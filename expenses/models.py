@@ -36,6 +36,14 @@ class Transaction(models.Model):
         return self.merchant
 
 
-class KnownKeyWords(models.Model):
-    txn_text_contains = models.CharField(max_length=200)
+class RuleType(models.Model):
+    text = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.text
+
+
+class Rule(models.Model):
+    rule_type = models.ForeignKey(RuleType, on_delete=models.CASCADE, null=True)
+    value = models.CharField(max_length=200)
     subCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)

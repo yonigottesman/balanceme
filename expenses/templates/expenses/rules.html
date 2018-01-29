@@ -1,0 +1,25 @@
+{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
+
+<div class="container border">
+  <div class="form-row ">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Type</th>
+          <th scope="col">value</th>
+          <th scope="col">Sub Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rule in rules %}    
+        <tr>
+          <td>{{rule.rule_type}}</td>
+          <td>{{rule.value}}</td>
+          <td>{{rule.subCategory}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+</div>

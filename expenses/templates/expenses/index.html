@@ -35,17 +35,13 @@
 
         <label for="search">Contains Text</label>
         <div class="input-group mb-2">
-          {% if search %}          
+          {% if search and search != 'None' %}          
           <input type="text" class="form-control" id="search" name="search" value="{{search}}">
           {% else %}
           <input type="text" class="form-control" id="search" name="search">
           {% endif %}
         </div>
-
       </div>
-
-
-      
     </div>
     <button type="submit" class="btn btn-primary">Filter</button>
   </form>
@@ -77,16 +73,16 @@
     </div>
 
     <div class="row justify-content-md-center ">
-
+      
       <script language="JavaScript">
         function toggle(source) {
-        checkboxes = document.getElementsByName('marked_checkbox');
-        for(var i=0, n=checkboxes.length;i<n;i++) {
-                                                  checkboxes[i].checked = source.checked;                                            
-                                                  }
-                                                  }
-                                                  </script>
-      
+            checkboxes = document.getElementsByName('marked_checkbox');
+            for(var i=0, n=checkboxes.length;i<n;i++) {
+                checkboxes[i].checked = source.checked;                                            
+            }
+        }
+      </script>
+
       <table class="table">
         <thead>
           <tr>
