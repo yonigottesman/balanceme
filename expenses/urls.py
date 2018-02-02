@@ -11,6 +11,8 @@ urlpatterns = [
     path('add_txn', views.add_txn, name='add_txn'),
     path('stats', views.stats, name='stats'),
 
+    path('stats/<str:month>', views.stats_month, name='stats_month'),
+
     #TODO what is name convention for post path?
     path('add_txn_post', views.add_txn_post, name='add_txn_post'),
     path('add_txn_file_post', views.add_txn_file_post, name='add_txn_file_post'),

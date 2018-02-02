@@ -2,7 +2,8 @@ import io
 
 from expenses.models import Transaction, InputSource
 import pandas as pd
-from .abstract import get_add_source
+from .abstract import get_add_source, get_untagged_subcategory
+
 
 class PoalimBankParser(object):
     ignore_visa_transactions = True
@@ -20,6 +21,7 @@ class PoalimBankParser(object):
         transactions = []
         file.file.seek(0)
         table = pd.read_excel(file, skiprows=5).to_dict('records')
+        untagged = get_untagged_subcategory()
         for row in table:
             if str(row['חובה']) == 'nan':
                 continue
@@ -33,7 +35,8 @@ class PoalimBankParser(object):
             if str(row['עבור']) != 'nan':
                 comment = str(row['עבור'])
             amount = float(row['חובה'])
-            transaction = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source)
+            transaction = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
+                                      subcategory=untagged)
             transactions.append(transaction)
         return transactions
 

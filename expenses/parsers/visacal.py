@@ -1,7 +1,7 @@
 from expenses.models import Transaction, InputSource
 import dateutil.parser
 
-from expenses.parsers.abstract import get_add_source
+from expenses.parsers.abstract import get_add_source, get_untagged_subcategory
 
 
 class VisaCalParser(object):
@@ -31,7 +31,8 @@ class VisaCalParser(object):
         if len(line.split("\t")) == 5:
             comment = line.split("\t")[4]
 
-        return Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source)
+        return Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
+                           subcategory=get_untagged_subcategory())
 
     def get_transactions(self, file):
         transactions = []

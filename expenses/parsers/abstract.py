@@ -1,4 +1,4 @@
-from expenses.models import InputSource, Transaction
+from expenses.models import InputSource, Transaction, Category, SubCategory
 
 
 class FileParser(object):
@@ -49,3 +49,7 @@ def remove_existing(new_transactions):
             without_duplicates.append(transaction)
 
     return without_duplicates
+
+def get_untagged_subcategory():
+    subcategory = SubCategory.objects.get(text="UnTagged")
+    return subcategory

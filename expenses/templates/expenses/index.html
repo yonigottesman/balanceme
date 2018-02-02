@@ -3,6 +3,7 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'expenses/style.css' %}" />
 
+
 <div class="container ">
   <form action="{% url 'expenses:filter_index' %}" method="post">
     {% csrf_token %}
@@ -22,15 +23,34 @@
       <div class="form-group col-md-3">
         <label for="inputSource">Source</label>
         <select id="source" class="form-control" name="source">
-          
           <option value="all">All</option>
-          
-          {% for source in inputSources %}
-          <option  value="{{source.id}}"> {{ source }}</option>
+          {% for s in inputSources %}
+          {% if s.id == source %}
+          <option  value="{{s.id}}" selected > {{s}}</option>
+          {% else %}
+          <option  value="{{s.id}}" > {{ s }}</option>
+
+          {% endif %}
+
           {% endfor %}
         </select>
       </div>
 
+      <div class="form-group col-md-3">
+        <label for="category">Category</label>
+        <select id="category" class="form-control" name="category">
+          <option value="all">All</option>
+          {% for c in categories %}
+          {% if category == c.id%}
+          <option  value="{{c.id}}" selected> {{ c }}</option>
+          {% else %}
+          <option  value="{{c.id}}"> {{ c }}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+
+      
       <div class="form-group col-md-3">
 
         <label for="search">Contains Text</label>
@@ -60,6 +80,7 @@
     <input name="endDate" type="hidden" value="{{endDate}}" />
     <input name="source" type="hidden" value="{{source}}" />
     <input name="search" type="hidden" value="{{search}}" />
+    <input name="category" type="hidden" value="{{category}}" />
 
     <div class="row">
       <div class="actions">
@@ -113,7 +134,7 @@
 
 
 {% else %}
-<p>No transactions are available.</p>
+<p>No transactions</p>
 {% endif %}
 
 
@@ -131,11 +152,11 @@
       {% if transactions.has_previous %}
 
       <li class="page-item">
-        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}" tabindex="-1">First</a>
+        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}" tabindex="-1">First</a>
       </li>
       
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}" tabindex="-1">Previous</a>
+        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}" tabindex="-1">Previous</a>
       </li>
 
       {% else %}
@@ -151,11 +172,11 @@
       
       {% if transactions.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}">Next</a>
+        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}">Next</a>
       </li>
 
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}">Last</a>
+        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}">Last</a>
       </li>
       
       {% else %}
