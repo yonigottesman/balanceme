@@ -66,9 +66,6 @@ def stats_month(request, month):
         pie_chart.add(category, pie_map[category])
 
     pie_chart.render()
-
-
-
     pie_chart = pie_chart.render_data_uri()
     context = {'chart': pie_chart}
 

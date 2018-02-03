@@ -30,7 +30,6 @@ def rules_add(request):
 
 
 def apply_rule(rule):
-    transactions = []
     if rule.rule_type.text == 'AnyText_Contains':
         transactions = Transaction.objects.filter(Q(merchant__icontains=rule.value) | Q(comment__icontains=rule.value))
         for transaction in transactions:
