@@ -37,7 +37,7 @@ def add_txn_file_post(request):
         parser = FileParser().factory(uploaded_file)
         if parser is None:
             return render(request, 'expenses/add.html', {'error_message': "Unknown file format",})
-        transactions = parser.get_transactions(uploaded_file)
+        transactions = parser.get_transactions(uploaded_file, request.user)
         transactions = remove_existing(transactions)
         for txn in transactions:
             txn.save()

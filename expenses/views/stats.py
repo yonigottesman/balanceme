@@ -16,7 +16,7 @@ def stats_month(request, month):
     start_date = date.replace(day=1)
     end_date = start_date + dateutil.relativedelta.relativedelta(months=1) + timedelta(-1)
 
-    transaction = Transaction.objects.filter(date__range=[start_date, end_date]).order_by('-subcategory')
+    transaction = Transaction.objects.filter(owner=request.user).filter(date__range=[start_date, end_date]).order_by('-subcategory')
 
     pie_map = {}
     total_sum = 0
@@ -78,7 +78,7 @@ def stats(request):
 
     sum_list = []
     for date in date_list:
-        sum_list.append(Transaction.objects.filter(date__year=date.year, date__month=date.month).aggregate(Sum('amount'))['amount__sum'])
+        sum_list.append(Transaction.objects.filter(owner=request.user).filter(date__year=date.year, date__month=date.month).aggregate(Sum('amount'))['amount__sum'])
 
     str_month_list = [datetime.strftime(x, '%b %Y') for x in date_list]
 

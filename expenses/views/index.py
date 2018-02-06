@@ -40,7 +40,6 @@ def get_datetime(date_str):
         return date
 
 
-@login_required
 def index(request):
 
     start_date = request.GET.get('startDate')
@@ -49,7 +48,7 @@ def index(request):
     search = request.GET.get('search')
     category_id = request.GET.get('category')
 
-    transaction_list = Transaction.objects
+    transaction_list = Transaction.objects.filter(owner=request.user)
 
     if get_datetime(start_date) is not None:
         transaction_list = transaction_list.filter(date__gte=get_datetime(start_date))
@@ -61,12 +60,10 @@ def index(request):
     if search != '' and search is not None and search != 'None':
         transaction_list = transaction_list.filter(Q(merchant__icontains=search) | Q(comment__icontains=search))
     if category_id is not None and category_id != 'None' and category_id != '' and category_id != 'all':
-        if category_id == '-1':
-            transaction_list = transaction_list.filter(subcategory=None)
-        else:
-            category = Category.objects.get(pk=category_id)
-            transaction_list = transaction_list.filter(subcategory__category=category)
+        category = Category.objects.get(owner=request.user, pk=category_id)
+        transaction_list = transaction_list.filter(owner=request.user, subcategory__category=category)
         category_id = int(category_id)
+
     transaction_list = transaction_list.order_by('-date')
 
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
@@ -78,8 +75,8 @@ def index(request):
                'inputSources': input_source_list,
                'source': source,
                'search': search,
-               'categories': Category.objects.all(),
-               'category':category_id,
+               'categories': Category.objects.filter(owner=request.user),
+               'category': category_id,
                }
 
     return render(request, 'expenses/index.html', context)

@@ -1,4 +1,5 @@
-from expenses.models import InputSource, Transaction, Category, SubCategory
+from expenses.common import UNTAGGED_SUBCATEGORY_TEXT, ANYTEXT_CONTAINS_RULE_TEXT
+from expenses.models import InputSource, Transaction, Category, SubCategory, Rule
 
 
 class FileParser(object):
@@ -20,11 +21,11 @@ class FileParser(object):
         return None
 
 
-def get_add_source(source_type_name, source_type_id):
+def get_add_source(user, source_type_name, source_type_id):
     try:
-        source = InputSource.objects.get(type_name=source_type_name, type_id=source_type_id)
+        source = InputSource.objects.get(owner=user, type_name=source_type_name, type_id=source_type_id)
     except InputSource.DoesNotExist:
-        source = InputSource(type_name=str(source_type_name), type_id=str(source_type_id))
+        source = InputSource(owner=user, type_name=str(source_type_name), type_id=str(source_type_id))
         source.save()
 
     return source
@@ -50,6 +51,18 @@ def remove_existing(new_transactions):
 
     return without_duplicates
 
-def get_untagged_subcategory():
-    subcategory = SubCategory.objects.get(text="UnTagged")
-    return subcategory
+
+def rule_applies(rule, merchant, comment):
+    if rule.rule_type.text == ANYTEXT_CONTAINS_RULE_TEXT:
+        if rule.value in merchant or rule.value in comment:
+            return rule.subCategory
+
+
+def get_subcategory(user, merchant, comment):
+    rules = Rule.objects.filter(owner=user)
+    for rule in rules:
+        if rule_applies(rule, merchant, comment):
+            return rule.subCategory
+
+    untagged_subcategory = SubCategory.objects.get(owner=user, text=UNTAGGED_SUBCATEGORY_TEXT)
+    return untagged_subcategory

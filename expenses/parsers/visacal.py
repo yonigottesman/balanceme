@@ -1,7 +1,7 @@
 from expenses.models import Transaction, InputSource
 import dateutil.parser
 
-from expenses.parsers.abstract import get_add_source, get_untagged_subcategory
+from expenses.parsers.abstract import get_add_source, get_subcategory
 
 
 class VisaCalParser(object):
@@ -14,7 +14,7 @@ class VisaCalParser(object):
         else:
             return date
 
-    def parse_transaction(self, line, source):
+    def parse_transaction(self, line, source, user):
         if len(line.split("\t")) != 4 and len(line.split("\t")) != 5:
             return None
 
@@ -32,16 +32,16 @@ class VisaCalParser(object):
             comment = line.split("\t")[4]
 
         return Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                           subcategory=get_untagged_subcategory())
+                           subcategory=get_subcategory(user=user, comment=comment, merchant=merchant), owner=user)
 
-    def get_transactions(self, file):
+    def get_transactions(self, file, user):
         transactions = []
         decoded_file = file.read().decode('utf-16')
         source_type = "visa"
         source_type_id = str(decoded_file.split("\n")[1].split("המסתיים בספרות")[1].split(",")[0])
-        source = get_add_source(source_type_name=source_type, source_type_id=source_type_id)
+        source = get_add_source(user=user, source_type_name=source_type, source_type_id=source_type_id)
         for line in decoded_file.split('\n'):
-            transaction = self.parse_transaction(line, source=source)
+            transaction = self.parse_transaction(line, source=source, user=user)
             if transaction != None:
                 transactions.append(transaction)
 

@@ -2,7 +2,7 @@
 
 <div class="container ">
   
-  <div class="">
+  <div class="border">
     <form  action="{% url 'expenses:rules_add' %}" method="post">
       {% csrf_token %}
       <div class="form-row">
@@ -12,7 +12,15 @@
           <select id="rule_type_id" class="form-control" name="rule_type_id" required="">
             <option value="" selected="">---------</option>
             {% for rt in rule_types %}
+
+            {% if rt.text == 'Any Text Contains'%}
             <option value="{{rt.id}}"> {{ rt }}</option>
+            {% else %}
+            <option value="{{rt.id}}" disabled> {{ rt }}</option>
+            {% endif %}
+            
+
+            
             {% endfor %}
           </select>          
         </div>

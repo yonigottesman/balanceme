@@ -68,9 +68,6 @@
 </div>
 
 
-
-
-{% if transactions %}
 <div class="container  ">
   
   <form action="{% url 'expenses:index_action' %}" method="post">
@@ -116,7 +113,7 @@
             <td>{{ transaction.merchant }}</td>
             <td>{{ transaction.amount }} ₪</td>
             <td>{{ transaction.comment }}</td>
-            {% if transaction.subcategory%}
+            {% if transaction.subcategory.text != 'No Tagging' %}
             <td>{{ transaction.subcategory }}</td>
             {% else %}
             <td></td>
@@ -130,17 +127,6 @@
     </div>
   </form>  
 </div>
-
-
-
-{% else %}
-<p>No transactions</p>
-{% endif %}
-
-
-
-
-
 
 <div class="container">
   <span class="current">

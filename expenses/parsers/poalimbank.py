@@ -2,7 +2,7 @@ import io
 
 from expenses.models import Transaction, InputSource
 import pandas as pd
-from .abstract import get_add_source, get_untagged_subcategory
+from .abstract import get_add_source, get_subcategory
 
 
 class PoalimBankParser(object):
@@ -14,14 +14,14 @@ class PoalimBankParser(object):
             return True
         return False
 
-    def get_transactions(self, file):
+    def get_transactions(self, file, user):
         source_type_name = 'Poalim Bank'
         source_type_id = str(pd.read_excel(file.file, skiprows=3).to_dict('records')[0]['תנועות בחשבון'].split(' ')[3])
-        source = get_add_source(source_type_name=source_type_name, source_type_id=source_type_id)
+        source = get_add_source(user=user, source_type_name=source_type_name, source_type_id=source_type_id)
         transactions = []
         file.file.seek(0)
         table = pd.read_excel(file, skiprows=5).to_dict('records')
-        untagged = get_untagged_subcategory()
+
         for row in table:
             if str(row['חובה']) == 'nan':
                 continue
@@ -36,7 +36,8 @@ class PoalimBankParser(object):
                 comment = str(row['עבור'])
             amount = float(row['חובה'])
             transaction = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                                      subcategory=untagged)
+                                      subcategory=get_subcategory(owner=user, comment=comment, merchant=merchant),
+                                      user=user)
             transactions.append(transaction)
         return transactions
 

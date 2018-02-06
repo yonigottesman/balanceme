@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'expenses.middleware.login_required.LoginRequiredMiddleware'
+    'accounts.middleware.login_required.LoginRequiredMiddleware'
 ]
 
 ROOT_URLCONF = 'balanceme.urls'
