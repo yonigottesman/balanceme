@@ -1,8 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-
-
+from django.http import JsonResponse
 
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -77,6 +76,7 @@ def index(request):
                'search': search,
                'categories': Category.objects.filter(owner=request.user),
                'category': category_id,
+               'subcategories': SubCategory.objects.filter(owner=request.user),
                }
 
     return render(request, 'expenses/index.html', context)
@@ -105,8 +105,8 @@ def edit_txn(request, txn_id):
 
 def index_action(request):
     marked_transactions = request.POST.getlist('marked_checkbox')
-    startDate = request.POST['startDate']
-    endDate = request.POST['endDate']
+    start_date = request.POST['startDate']
+    end_date = request.POST['endDate']
     source = request.POST['source']
     search = request.POST['search']
     category = request.POST['category']
@@ -115,6 +115,21 @@ def index_action(request):
         for marked in marked_transactions:
             transaction = Transaction.objects.get(pk=marked)
             transaction.delete()
-    url = reverse('expenses:index') + "?startDate=" + startDate + "&endDate=" + endDate + '&source=' + source \
+    url = reverse('expenses:index') + "?startDate=" + start_date + "&endDate=" + end_date + '&source=' + source \
           + '&search' + search + '&category='+ category
     return HttpResponseRedirect(url)
+
+
+def save_post(request):
+    transaction_id = request.POST['transaction_id']
+    subcategory_id = request.POST['subcategory_id']
+
+    transaction = Transaction.objects.get(owner=request.user, pk=transaction_id)
+    new_subcategory = SubCategory.objects.get(owner=request.user, pk= subcategory_id)
+
+    transaction.subcategory = new_subcategory
+    transaction.save()
+
+    data = {}
+    return JsonResponse(data)
+

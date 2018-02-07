@@ -10,6 +10,7 @@ urlpatterns = [
     path('index_action', views.index_action, name='index_action'),
     path('add_txn', views.add_txn, name='add_txn'),
     path('stats', views.stats, name='stats'),
+    path('save_post/', views.save_post, name='save_post'),
 
     path('stats/<str:month>', views.stats_month, name='stats_month'),
 

@@ -1,7 +1,8 @@
-{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'expenses/style.css' %}" />
+{% extends "expenses/base.html" %}
+
+{% block content %}
+{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
 
 <div class="container ">
@@ -113,12 +114,31 @@
             <td>{{ transaction.merchant }}</td>
             <td>{{ transaction.amount }} ₪</td>
             <td>{{ transaction.comment }}</td>
-            {% if transaction.subcategory.text != 'No Tagging' %}
-            <td>{{ transaction.subcategory }}</td>
-            {% else %}
-            <td></td>
-            {% endif%}
-            <td>{{ transaction.source }}</td>
+            
+            <td>
+              <div class="container ">
+                
+                
+                <div class="row">
+                  <div class="col-sm">
+                    <select id="subcategory_select_{{transaction.id}}" onchange="show_save(this, {{transaction.id}})">
+                      {% for sc in subcategories %}
+                      {% if sc == transaction.subcategory%}
+                      <option id="{{sc.id}}"  selected>{{ sc }}</option>
+                      {% else %}
+                      <option id="{{sc.id}}">{{ sc }}</option>
+                      {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="col-sm">
+                    <button type="button" class="btn btn-primary btn-sm" id="save_button_{{transaction.id}}" hidden onClick="save_subcategory(this, {{transaction.id}})">Save</button>
+                  </div>
+                </div>
+              </div>
+            </td>
+            
+            <td><div contenteditable>{{ transaction.source }}</div></td>
           </tr>
           {% endfor %}
 
@@ -190,3 +210,45 @@
         }
     }
 </script>
+
+<script language="JavaScript">
+    function show_save(source, id) {
+        button_id = "save_button_"+id
+        $("#" + button_id).prop("hidden",false);
+    }
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+
+
+  function save_subcategory(source, id) {
+
+      var csrftoken = Cookies.get('csrftoken');
+      var subcategory_id = $("#" + "subcategory_select_" + id).find(":selected").attr("id")
+      $.ajax({
+          type: "POST",
+          url: '/expenses/save_post/',
+          data: {
+              'transaction_id': id,
+              'subcategory_id': subcategory_id
+          },
+          beforeSend: function(xhr, settings) {
+              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+              }
+          },
+          dataType: 'json',
+          success: function (data) {
+             
+          }
+      });
+
+      
+      button_id = "save_button_"+id
+      $("#" + button_id).prop("hidden",true);
+    }
+</script>
+
+{% endblock %}

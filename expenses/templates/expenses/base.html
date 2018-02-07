@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'expenses/style.css' %}" />
+
+  <!-- includes -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  
+<body>
+  <div id="content">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
