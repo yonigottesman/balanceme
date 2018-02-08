@@ -7,10 +7,24 @@
 
   <!-- includes -->
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+
+
+  
   
 <body>
   <div id="content">
     {% block content %}{% endblock %}
   </div>
 </body>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+        $(".currency").each(function(){
+            var num = Number($(this).text()).toLocaleString('en');
+            $(this).text(num.toString() + "₪");
+        })
+    });
+  </script>
+
+  
 </html>

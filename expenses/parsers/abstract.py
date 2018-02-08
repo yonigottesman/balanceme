@@ -2,13 +2,15 @@ from expenses.common import UNTAGGED_SUBCATEGORY_TEXT, ANYTEXT_CONTAINS_RULE_TEX
 from expenses.models import InputSource, Transaction, Category, SubCategory, Rule
 
 
+
 class FileParser(object):
 
     def __init__(self):
         from .visacal import VisaCalParser
         from .poalimbank import PoalimBankParser
+        from .mastercard import MastercardParser
 
-        self.parsers = [VisaCalParser(), PoalimBankParser()]
+        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser()]
 
     def factory(self, file):
 

@@ -1,3 +1,5 @@
+import time
+
 from expenses.models import Transaction, InputSource
 import dateutil.parser
 
@@ -15,36 +17,47 @@ class VisaCalParser(object):
             return date
 
     def parse_transaction(self, line, source, user):
-        if len(line.split("\t")) != 4 and len(line.split("\t")) != 5:
+        #ts = time.time()
+        splits = line.split("\t")
+        if len(splits) != 4 and len(splits) != 5:
             return None
-
-        date = self.get_date(line.split("\t")[0])
+        #print("transaction 0 " + str(time.time() - ts))
+        date = self.get_date(splits[0])
         if date == None:
             return None
-
-        merchant = line.split("\t")[1]
-        amount = line.split("\t")[3].split("₪")[0].replace(',','')
+        #print("transaction 1 " + str(time.time() - ts))
+        merchant = splits[1]
+        amount = splits[3].split("₪")[0].replace(',','')
+        #print("transaction 2 " + str(time.time() - ts))
         if '-' in amount:
             amount = '-' + amount.replace('-','')
-
+        #print("transaction 3 " + str(time.time() - ts))
         comment = ""
-        if len(line.split("\t")) == 5:
+        if len(splits) == 5:
             comment = line.split("\t")[4]
 
-        return Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                           subcategory=get_subcategory(user=user, comment=comment, merchant=merchant), owner=user)
+        #print("transaction 4 " + str(time.time() - ts))
+        tx = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
+                         subcategory=get_subcategory(user=user, comment=comment, merchant=merchant), owner=user)
+
+        #print("transaction end " + str(time.time() - ts))
+        return tx
 
     def get_transactions(self, file, user):
+
         transactions = []
         decoded_file = file.read().decode('utf-16')
         source_type = "visa"
         source_type_id = str(decoded_file.split("\n")[1].split("המסתיים בספרות")[1].split(",")[0])
         source = get_add_source(user=user, source_type_name=source_type, source_type_id=source_type_id)
+
         for line in decoded_file.split('\n'):
+
             transaction = self.parse_transaction(line, source=source, user=user)
             if transaction != None:
                 transactions.append(transaction)
 
+        print(len(transactions))
         return transactions
 
     def is_me(self, file):

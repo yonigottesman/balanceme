@@ -5,6 +5,7 @@
 {% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
 
+
 <div class="container ">
   <form action="{% url 'expenses:filter_index' %}" method="post">
     {% csrf_token %}
@@ -112,7 +113,7 @@
             <td><input type="checkbox" value="{{ transaction.id }}" name="marked_checkbox"></td>
             <td>{{ transaction.date }}</td>
             <td>{{ transaction.merchant }}</td>
-            <td>{{ transaction.amount }} ₪</td>
+            <td class="currency" >{{ transaction.amount }}</td>
             <td>{{ transaction.comment }}</td>
             
             <td>
@@ -138,7 +139,7 @@
               </div>
             </td>
             
-            <td><div contenteditable>{{ transaction.source }}</div></td>
+            <td><div>{{ transaction.source }}</div></td>
           </tr>
           {% endfor %}
 
@@ -250,5 +251,8 @@
       $("#" + button_id).prop("hidden",true);
     }
 </script>
+
+
+
 
 {% endblock %}

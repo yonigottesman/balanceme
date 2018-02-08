@@ -36,11 +36,10 @@ class PoalimBankParser(object):
                 comment = str(row['עבור'])
             amount = float(row['חובה'])
             transaction = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                                      subcategory=get_subcategory(owner=user, comment=comment, merchant=merchant),
-                                      user=user)
+                                      subcategory=get_subcategory(user=user, comment=comment, merchant=merchant),
+                                      owner=user)
             transactions.append(transaction)
         return transactions
-
 
 
     def is_me(self, file):

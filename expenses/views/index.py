@@ -113,7 +113,7 @@ def index_action(request):
 
     if request.POST['action'] == 'delete':
         for marked in marked_transactions:
-            transaction = Transaction.objects.get(pk=marked)
+            transaction = Transaction.objects.get(owner=request.user, pk=int(marked))
             transaction.delete()
     url = reverse('expenses:index') + "?startDate=" + start_date + "&endDate=" + end_date + '&source=' + source \
           + '&search' + search + '&category='+ category
