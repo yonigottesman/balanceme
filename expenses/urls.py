@@ -13,6 +13,7 @@ urlpatterns = [
     path('save_post/', views.save_post, name='save_post'),
 
     path('stats/<str:month>', views.stats_month, name='stats_month'),
+    path('stats/<str:month>/<str:category_str>', views.stats_month_category, name='stats_month_category'),
 
     #TODO what is name convention for post path?
     path('add_txn_post', views.add_txn_post, name='add_txn_post'),

@@ -37,6 +37,11 @@ class Transaction(models.Model):
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    @classmethod
+    def create(cls, comment, merchant, date, amount, source, subcategory, user):
+        return Transaction(comment=comment, merchant=merchant.replace('\'', ''), date=date, amount=amount,
+                           source=source, subcategory=subcategory, owner=user)
+
     def __str__(self):
         return self.merchant
 

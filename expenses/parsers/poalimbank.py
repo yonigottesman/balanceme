@@ -35,9 +35,10 @@ class PoalimBankParser(object):
             if str(row['עבור']) != 'nan':
                 comment = str(row['עבור'])
             amount = float(row['חובה'])
-            transaction = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                                      subcategory=get_subcategory(user=user, comment=comment, merchant=merchant),
-                                      owner=user)
+            transaction = Transaction.create(comment=comment, merchant=merchant, date=date,
+                                             amount=amount, source=source,
+                                             subcategory=get_subcategory(user=user, comment=comment, merchant=merchant),
+                                             user=user)
             transactions.append(transaction)
         return transactions
 

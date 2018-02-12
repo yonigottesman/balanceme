@@ -17,30 +17,27 @@ class VisaCalParser(object):
             return date
 
     def parse_transaction(self, line, source, user):
-        #ts = time.time()
+
         splits = line.split("\t")
         if len(splits) != 4 and len(splits) != 5:
             return None
-        #print("transaction 0 " + str(time.time() - ts))
+
         date = self.get_date(splits[0])
         if date == None:
             return None
-        #print("transaction 1 " + str(time.time() - ts))
+
         merchant = splits[1]
         amount = splits[3].split("₪")[0].replace(',','')
-        #print("transaction 2 " + str(time.time() - ts))
+
         if '-' in amount:
             amount = '-' + amount.replace('-','')
-        #print("transaction 3 " + str(time.time() - ts))
+
         comment = ""
         if len(splits) == 5:
             comment = line.split("\t")[4]
 
-        #print("transaction 4 " + str(time.time() - ts))
-        tx = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                         subcategory=get_subcategory(user=user, comment=comment, merchant=merchant), owner=user)
-
-        #print("transaction end " + str(time.time() - ts))
+        tx = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
+                                subcategory=get_subcategory(user=user, comment=comment, merchant=merchant), user=user)
         return tx
 
     def get_transactions(self, file, user):

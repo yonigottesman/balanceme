@@ -26,9 +26,10 @@ class MastercardParser(object):
             if str(row['פירוט נוסף']) != 'nan':
                 comment = str(row['פירוט נוסף'])
             amount = float(row['סכום חיוב'])
-            transaction = Transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                                      subcategory=get_subcategory(user=user, comment=comment, merchant=merchant),
-                                      owner=user)
+            transaction = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount,
+                                             source=source,
+                                             subcategory=get_subcategory(user=user, comment=comment, merchant=merchant),
+                                             user=user)
             transactions.append(transaction)
         return transactions
 

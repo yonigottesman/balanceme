@@ -46,6 +46,7 @@ def index(request):
     source = request.GET.get('source')
     search = request.GET.get('search')
     category_id = request.GET.get('category')
+    subcategory_id = request.GET.get('subcategory')
 
     transaction_list = Transaction.objects.filter(owner=request.user)
 
@@ -60,8 +61,11 @@ def index(request):
         transaction_list = transaction_list.filter(Q(merchant__icontains=search) | Q(comment__icontains=search))
     if category_id is not None and category_id != 'None' and category_id != '' and category_id != 'all':
         category = Category.objects.get(owner=request.user, pk=category_id)
-        transaction_list = transaction_list.filter(owner=request.user, subcategory__category=category)
+        transaction_list = transaction_list.filter(subcategory__category=category)
         category_id = int(category_id)
+    if subcategory_id != '' and subcategory_id is not None and subcategory_id!= 'None':
+        subcategory = SubCategory.objects.get(owner=request.user, pk=subcategory_id)
+        transaction_list = transaction_list.filter(subcategory=subcategory)
 
     transaction_list = transaction_list.order_by('-date')
 
@@ -76,6 +80,7 @@ def index(request):
                'search': search,
                'categories': Category.objects.filter(owner=request.user),
                'category': category_id,
+               'subcategory': subcategory_id,
                'subcategories': SubCategory.objects.filter(owner=request.user),
                }
 

@@ -5,6 +5,35 @@
 {% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
 
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog" backdrop="false">
+  <div class="modal-dialog modal-sm">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h4 class="modal-title">New rule</h4>
+      </div>
+      <div class="modal-body">
+        <label for="date">Text Contains</label>
+        <input type="text" class="form-control" id="add_rule_text" name="add_rule_text" value="">
+        <br>
+        <select id="add_rule_subcategory">
+          <!-- <option id="-1" selected="">---------</option>           -->
+          {% for sc in subcategories %}
+          <option id="{{sc.id}}" value="{{sc.id}}">{{ sc }}</option>
+          {% endfor %}
+        </select>        
+        <button type="button" class="btn btn-info btn-sm" onClick="add_rule(this)" >Save</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <div class="container ">
   <form action="{% url 'expenses:filter_index' %}" method="post">
@@ -80,6 +109,7 @@
     <input name="source" type="hidden" value="{{source}}" />
     <input name="search" type="hidden" value="{{search}}" />
     <input name="category" type="hidden" value="{{category}}" />
+    <input name="subcategory" type="hidden" value="{{subcategory}}" />
 
     <div class="row">
       <div class="actions">
@@ -112,14 +142,14 @@
           <tr>
             <td><input type="checkbox" value="{{ transaction.id }}" name="marked_checkbox"></td>
             <td>{{ transaction.date }}</td>
-            <td>{{ transaction.merchant }}</td>
+            <td>
+              <div class="col-sm">{{ transaction.merchant }}</div>
+            </td>
             <td class="currency" >{{ transaction.amount }}</td>
             <td>{{ transaction.comment }}</td>
             
             <td>
               <div class="container ">
-                
-                
                 <div class="row">
                   <div class="col-sm">
                     <select id="subcategory_select_{{transaction.id}}" onchange="show_save(this, {{transaction.id}})">
@@ -133,7 +163,7 @@
                     </select>
                   </div>
                   <div class="col-sm">
-                    <button type="button" class="btn btn-primary btn-sm" id="save_button_{{transaction.id}}" hidden onClick="save_subcategory(this, {{transaction.id}})">Save</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="save_button_{{transaction.id}}" hidden onClick="save_subcategory(this, {{transaction.id}},'{{transaction.merchant}}')" >Save</button>
                   </div>
                 </div>
               </div>
@@ -159,11 +189,11 @@
       {% if transactions.has_previous %}
 
       <li class="page-item">
-        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}" tabindex="-1">First</a>
+        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}" tabindex="-1">First</a>
       </li>
       
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}" tabindex="-1">Previous</a>
+        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}" tabindex="-1">Previous</a>
       </li>
 
       {% else %}
@@ -179,11 +209,11 @@
       
       {% if transactions.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}">Next</a>
+        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}">Next</a>
       </li>
 
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}">Last</a>
+        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}">Last</a>
       </li>
       
       {% else %}
@@ -224,15 +254,16 @@
   }
 
 
-  function save_subcategory(source, id) {
+  function save_subcategory(source, transaction_id, merchant) {
+
 
       var csrftoken = Cookies.get('csrftoken');
-      var subcategory_id = $("#" + "subcategory_select_" + id).find(":selected").attr("id")
+      var subcategory_id = $("#" + "subcategory_select_" + transaction_id).find(":selected").attr("id")
       $.ajax({
           type: "POST",
           url: '/expenses/save_post/',
           data: {
-              'transaction_id': id,
+              'transaction_id': transaction_id,
               'subcategory_id': subcategory_id
           },
           beforeSend: function(xhr, settings) {
@@ -245,11 +276,40 @@
              
           }
       });
-
+      $("#add_rule_text").val(merchant)
+      $("#add_rule_subcategory").val(subcategory_id)
+      $("#myModal").modal();
       
-      button_id = "save_button_"+id
+      button_id = "save_button_"+transaction_id
       $("#" + button_id).prop("hidden",true);
-    }
+  }
+
+
+  function add_rule(source) {
+      var csrftoken = Cookies.get('csrftoken');
+      $.ajax({
+          type: "POST",
+          url: '/expenses/rules_add',
+          data: {
+              'value': $("#add_rule_text").val(),
+              'subcategory_id': $("#add_rule_subcategory").find(":selected").attr("id"),
+              'rule_type_id':3
+          },
+          beforeSend: function(xhr, settings) {
+              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+              }
+          },
+          dataType: 'json',
+          success: function (data) {
+             
+          }
+      });
+      
+      location.reload();
+  }
+
+
 </script>
 
 
