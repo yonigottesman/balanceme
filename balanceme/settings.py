@@ -25,7 +25,7 @@ SECRET_KEY = '$*tmd0!%if-n$1=%=^^l-&iwa)jx^&&4=wch!*%#k&v4n%2gz4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['balance-me.herokuapp.com']
 
 
 # Application definition
