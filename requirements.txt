@@ -1,8 +1,14 @@
+bokeh==0.12.13
 dj-database-url==0.4.2
 Django==2.0.1
 gunicorn==19.7.1
+Jinja2==2.10
+MarkupSafe==1.0
+numpy==1.14.0
 pygal==2.4.0
 python-dateutil==2.6.1
 pytz==2017.3
+PyYAML==3.12
 six==1.11.0
+tornado==4.5.3
 whitenoise==3.3.1

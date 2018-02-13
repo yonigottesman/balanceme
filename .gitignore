@@ -3,3 +3,6 @@ db.sqlite3
 *.pyc
 *~
 *#
+venv
+staticfiles
+.env

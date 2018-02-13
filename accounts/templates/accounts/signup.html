@@ -1,29 +1,62 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+<!-- {% load static %} -->
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'accounts/style.css' %}" /> -->
+
 <!-- templates/signup.html -->
 
-
-{% block title %}Sign Up{% endblock %}
-
 {% block content %}
-  <!-- <h2>Sign up</h2> -->
-  <form method="post">
-    {% csrf_token %}
 
 
-<!-- {% for field in form %} -->
-<!--       <p> -->
-<!--         {{ field.label_tag }}<br> -->
-<!--         {{ field }} -->
-<!--         {% if field.help_text %} -->
-<!--           <small style="color: grey">{{ field.help_text }}</small> -->
-<!--         {% endif %} -->
-<!--         {% for error in field.errors %} -->
-<!--           <p style="color: red">{{ error }}</p> -->
-<!--         {% endfor %} -->
-<!--       </p> -->
-<!--     {% endfor %} -->
-
+{% for field in form %}
+{% for error in field.errors %}
+<p style="color: red">{{ error }}</p>
+{% endfor %}
+{% endfor %}  
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-md-4 col-md-offset-4">
+            <h1 class="text-center login-title">Signup to Balanceme</h1>
+            <div class="account-wall">
+              <form class="form-signin" method="post" action="{% url 'signup' %}">
+                {% csrf_token %}
+                <input type="text" name="username" maxlength="150" autofocus="" required="" id="id_username" class="form-control" placeholder="Username">
+                <input type="password" name="password1" required="" id="id_password1" placeholder="password" class="form-control">
+                <input type="password" name="password2" required="" id="id_password2" placeholder="password confermation" class="form-control">
     
-    {{ form.as_p }}
-    <button type="submit">Sign up</button>
-  </form>
-{% endblock %}
+                
+                <input type="hidden" name="next" value="{{ next }}" />
+
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- <form method="post"> -->
+<!--   {% csrf_token %} -->
+  
+  
+<!--   {% for field in form %} -->
+<!--   <p> -->
+<!--     {{ field.label_tag }}<br> -->
+<!--     {{ field }} -->
+<!--     {% if field.help_text %} -->
+<!--     <\!-- <small style="color: grey">{{ field.help_text }}</small> -\-> -->
+<!--     {% endif %} -->
+<!--     {% for error in field.errors %} -->
+<!--   <p style="color: red">{{ error }}</p> -->
+<!--   {% endfor %} -->
+<!--   </p> -->
+<!--   {% endfor %} -->
+  
+  
+<!-- {{ form.as_p }} -->
+<!--   <button type="submit">Sign up</button> -->
+<!-- </form> -->
+<!-- {% endblock %} -->
