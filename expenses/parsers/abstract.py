@@ -55,9 +55,9 @@ def remove_existing(new_transactions):
 
 
 def rule_applies(rule, merchant, comment):
-    if rule.rule_type.text == ANYTEXT_CONTAINS_RULE_TEXT:
-        if rule.value in merchant or rule.value in comment:
-            return rule.subCategory
+    #if rule.rule_type.text == ANYTEXT_CONTAINS_RULE_TEXT:
+    if rule.value in merchant or rule.value in comment:
+        return rule.subCategory
 
 
 def get_subcategory(user, merchant, comment):

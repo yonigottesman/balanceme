@@ -93,21 +93,6 @@ def detail(request, txn_id):
                                                     'subCatagories':SubCategory.objects.all()})
 
 
-def edit_txn(request, txn_id):
-    transaction = get_object_or_404(Transaction, pk=txn_id)
-    try:
-        selected_subCatagory_id = request.POST['SubCatagory']
-    except (KeyError, SubCategory.DoesNotExist):
-        # Redisplay the transaction voting form.
-        return render(request, 'expenses/detail.html', {
-            'transaction': transaction,
-            'error_message': "You didn't select a choice.", })
-    else:
-        transaction.subcategory = SubCategory.objects.get(pk=selected_subCatagory_id)
-        transaction.save()
-        return HttpResponseRedirect(reverse('expenses:index'))
-
-
 def index_action(request):
     marked_transactions = request.POST.getlist('marked_checkbox')
     start_date = request.POST['startDate']

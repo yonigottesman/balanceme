@@ -46,7 +46,7 @@ def create_user_defaults(user):
             subcategory_object = SubCategory(text=subcategory, category=category_object, owner=user)
             subcategory_object.save()
 
-    rule_type = RuleType.objects.get(text='Any Text Contains')
+    rule_type = None #RuleType.objects.get(text='Any Text Contains')
     for subcategory in DEFAULT_ALL_CONTAINS_RULES:
         subcategory_object = SubCategory.objects.get(owner=user, text=subcategory)
         for value in DEFAULT_ALL_CONTAINS_RULES[subcategory]:

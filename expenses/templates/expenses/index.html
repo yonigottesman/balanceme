@@ -292,8 +292,7 @@
           url: '/expenses/rules_add',
           data: {
               'value': $("#add_rule_text").val(),
-              'subcategory_id': $("#add_rule_subcategory").find(":selected").attr("id"),
-              'rule_type_id':3
+              'subcategory_id': $("#add_rule_subcategory").find(":selected").attr("id")
           },
           beforeSend: function(xhr, settings) {
               if (!csrfSafeMethod(settings.type) && !this.crossDomain) {

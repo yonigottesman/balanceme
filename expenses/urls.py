@@ -19,10 +19,6 @@ urlpatterns = [
     path('add_txn_post', views.add_txn_post, name='add_txn_post'),
     path('add_txn_file_post', views.add_txn_file_post, name='add_txn_file_post'),
 
-    # ex: /expenses/5/
-    path('<int:txn_id>/', views.detail, name='detail'),
-    # ex: /expenses/5/edit_txn/
-    path('<int:txn_id>/edit_txn/', views.edit_txn, name='edit_txn'),
     path('categories', views.categories, name='categories'),
     path('categories_add', views.categories_add, name='categories_add'),
     path('sub_categories_add', views.sub_categories_add, name='sub_categories_add'),

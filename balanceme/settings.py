@@ -25,7 +25,7 @@ SECRET_KEY = '$*tmd0!%if-n$1=%=^^l-&iwa)jx^&&4=wch!*%#k&v4n%2gz4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['balance-me.herokuapp.com']
+ALLOWED_HOSTS = ['balance-me.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -79,10 +79,21 @@ WSGI_APPLICATION = 'balanceme.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'balanceme',
+        'USER': 'yonigo',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
