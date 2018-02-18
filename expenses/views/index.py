@@ -78,10 +78,10 @@ def index(request):
                'inputSources': input_source_list,
                'source': source,
                'search': search,
-               'categories': Category.objects.filter(owner=request.user),
+               'categories': Category.objects.filter(owner=request.user).order_by('text'),
                'category': category_id,
                'subcategory': subcategory_id,
-               'subcategories': SubCategory.objects.filter(owner=request.user),
+               'subcategories': SubCategory.objects.filter(owner=request.user).order_by('text'),
                }
 
     return render(request, 'expenses/index.html', context)

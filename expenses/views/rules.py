@@ -8,9 +8,9 @@ from expenses.models import SubCategory, RuleType, Rule, Transaction
 
 
 def rules(request):
-    rules = Rule.objects.filter(owner=request.user)
+    rules = Rule.objects.filter(owner=request.user).order_by('subCategory')
     rule_types = RuleType.objects.all()
-    subcategories = SubCategory.objects.filter(owner=request.user)
+    subcategories = SubCategory.objects.filter(owner=request.user).order_by('text')
     context = {'rules': rules,
                'rule_types': rule_types,
                'subcategories': subcategories}

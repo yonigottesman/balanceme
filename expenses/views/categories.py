@@ -6,8 +6,8 @@ from expenses.models import SubCategory, Category, Rule, RuleType
 
 
 def categories(request):
-    sub_categories = SubCategory.objects.filter(owner=request.user).order_by('-category')
-    all_categories = Category.objects.filter(owner=request.user).order_by('-text')
+    sub_categories = SubCategory.objects.filter(owner=request.user).order_by('category')
+    all_categories = Category.objects.filter(owner=request.user).order_by('text')
     context = {
         'sub_categories': sub_categories,
         'categories': all_categories

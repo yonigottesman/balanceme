@@ -7,7 +7,7 @@ from expenses.models import SubCategory
 from expenses.parsers.abstract import FileParser, remove_existing
 
 
-def add_txn(request):
+def add(request):
     return render(request, 'expenses/add.html', {'subcategories': SubCategory.objects.all()})
 
 

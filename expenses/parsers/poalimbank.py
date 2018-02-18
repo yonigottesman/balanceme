@@ -15,33 +15,37 @@ class PoalimBankParser(object):
         return False
 
     def get_transactions(self, file, user):
-        source_type_name = 'Poalim Bank'
-        source_type_id = str(pd.read_excel(file.file, skiprows=3).to_dict('records')[0]['תנועות בחשבון'].split(' ')[3])
-        source = get_add_source(user=user, source_type_name=source_type_name, source_type_id=source_type_id)
-        transactions = []
-        file.file.seek(0)
-        table = pd.read_excel(file, skiprows=5).to_dict('records')
+        try:
+            source_type_name = 'Poalim Bank'
+            source_type_id = str(
+                pd.read_excel(file.file, skiprows=3).to_dict('records')[0]['תנועות בחשבון'].split(' ')[3])
+            source = get_add_source(user=user, source_type_name=source_type_name, source_type_id=source_type_id)
+            transactions = []
+            file.file.seek(0)
+            table = pd.read_excel(file, skiprows=5).to_dict('records')
 
-        for row in table:
-            if str(row['חובה']) == 'nan':
-                continue
-            date = row['תאריך ערך'].date()
-            merchant = row['הפעולה']
-            if self.is_visa_transaction(merchant) and self.ignore_visa_transactions:
-                continue
-            if str(row['לטובת']) != 'nan':
-                merchant = merchant + ' ' + str(row['לטובת'])
-            comment = ''
-            if str(row['עבור']) != 'nan':
-                comment = str(row['עבור'])
-            amount = float(row['חובה'])
-            transaction = Transaction.create(comment=comment, merchant=merchant, date=date,
-                                             amount=amount, source=source,
-                                             subcategory=get_subcategory(user=user, comment=comment, merchant=merchant),
-                                             user=user)
-            transactions.append(transaction)
-        return transactions
-
+            for row in table:
+                if str(row['חובה']) == 'nan':
+                    continue
+                date = row['תאריך ערך'].date()
+                merchant = row['הפעולה']
+                if self.is_visa_transaction(merchant) and self.ignore_visa_transactions:
+                    continue
+                if str(row['לטובת']) != 'nan':
+                    merchant = merchant + ' ' + str(row['לטובת'])
+                comment = ''
+                if str(row['עבור']) != 'nan':
+                    comment = str(row['עבור'])
+                amount = float(row['חובה'])
+                transaction = Transaction.create(comment=comment, merchant=merchant, date=date,
+                                                 amount=amount, source=source,
+                                                 subcategory=get_subcategory(user=user, comment=comment,
+                                                                             merchant=merchant),
+                                                 user=user)
+                transactions.append(transaction)
+            return transactions
+        except Exception as e:
+            return []
 
     def is_me(self, file):
         try:

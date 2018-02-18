@@ -8,7 +8,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('filter_index', views.filter_index, name='filter_index'),
     path('index_action', views.index_action, name='index_action'),
-    path('add_txn', views.add_txn, name='add_txn'),
+    path('add', views.add, name='add'),
     path('stats', views.stats, name='stats'),
     path('save_post/', views.save_post, name='save_post'),
 

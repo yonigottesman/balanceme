@@ -5,7 +5,7 @@
   <div class="border">
     <form  action="{% url 'expenses:rules_add' %}" method="post">
       {% csrf_token %}
-      <div class="form-row">
+      <div class="row">
         
         <!-- <div class="form-group col-md-4"> -->
         <!--   <label for="subcategory">Rule Type</label> -->
@@ -46,7 +46,7 @@
       <button type="add" class="btn btn-primary">Add</button>      
     </form>
   </div>
-  
+  <br>
   <div class="container  ">
     <form action="{% url 'expenses:rules_action' %}" method="post">
       {% csrf_token %}
