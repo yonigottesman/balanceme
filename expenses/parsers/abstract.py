@@ -41,7 +41,8 @@ def remove_existing(new_transactions):
     without_duplicates = []
     for transaction in new_transactions:
 
-        found = Transaction.objects\
+        found = Transaction.objects \
+            .filter(owner=transaction.owner) \
             .filter(comment=transaction.comment)\
             .filter(merchant=transaction.merchant)\
             .filter(amount=transaction.amount)\
@@ -56,7 +57,7 @@ def remove_existing(new_transactions):
 
 def rule_applies(rule, merchant, comment):
     #if rule.rule_type.text == ANYTEXT_CONTAINS_RULE_TEXT:
-    if rule.value in merchant or rule.value in comment:
+    if rule.value.lower() in merchant.lower() or rule.value.lower() in comment.lower():
         return rule.subCategory
 
 

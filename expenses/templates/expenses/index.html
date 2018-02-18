@@ -1,8 +1,6 @@
-
 {% extends "expenses/base.html" %}
 
 {% block content %}
-{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
 
 
 <!-- Modal -->
@@ -122,7 +120,7 @@
       </div>
     </div>
 
-    <div class="row  ">
+    <div class="row table-responsive text-nowrap">
       <table class="table">
         <thead>
           <tr>
@@ -149,24 +147,17 @@
             <td>{{ transaction.comment }}</td>
             
             <td>
-              <div class="container ">
-                <div class="row">
-                  <div class="col-sm">
-                    <select id="subcategory_select_{{transaction.id}}" onchange="show_save(this, {{transaction.id}})">
-                      {% for sc in subcategories %}
-                      {% if sc == transaction.subcategory%}
-                      <option id="{{sc.id}}"  selected>{{ sc }}</option>
-                      {% else %}
-                      <option id="{{sc.id}}">{{ sc }}</option>
-                      {% endif %}
-                      {% endfor %}
-                    </select>
-                  </div>
-                  <div class="col-sm">
-                    <button type="button" class="btn btn-primary btn-sm" id="save_button_{{transaction.id}}" hidden onClick="save_subcategory(this, {{transaction.id}},'{{transaction.merchant}}')" >Save</button>
-                  </div>
-                </div>
-              </div>
+
+              <select id="subcategory_select_{{transaction.id}}" onchange="show_save(this, {{transaction.id}})">
+                {% for sc in subcategories %}
+                {% if sc == transaction.subcategory%}
+                <option id="{{sc.id}}"  selected>{{ sc }}</option>
+                {% else %}
+                <option id="{{sc.id}}">{{ sc }}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              <button type="button" class="btn btn-primary btn-sm" id="save_button_{{transaction.id}}" hidden onClick="save_subcategory(this, {{transaction.id}},'{{transaction.merchant}}')" >Save</button>
             </td>
             
             <td><div>{{ transaction.source }}</div></td>

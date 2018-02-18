@@ -1,5 +1,7 @@
-{% block navbar %}{% include 'expenses/navbar.html' %}{% endblock navbar%}
+{% extends "expenses/base.html" %}
 
+
+{% block content %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
@@ -60,3 +62,4 @@
   </div>
 
 </div>
+{% endblock %}

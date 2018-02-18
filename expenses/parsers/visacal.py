@@ -27,7 +27,7 @@ class VisaCalParser(object):
             return None
 
         merchant = splits[1]
-        amount = splits[3].split("₪")[0].replace(',','')
+        amount = float(splits[3].split("₪")[0].replace(',',''))
 
         if '-' in amount:
             amount = '-' + amount.replace('-','')
@@ -41,21 +41,23 @@ class VisaCalParser(object):
         return tx
 
     def get_transactions(self, file, user):
+        try:
+            transactions = []
+            decoded_file = file.read().decode('utf-16')
+            source_type = "visa"
+            source_type_id = str(decoded_file.split("\n")[1].split("המסתיים בספרות")[1].split(",")[0])
+            source = get_add_source(user=user, source_type_name=source_type, source_type_id=source_type_id)
 
-        transactions = []
-        decoded_file = file.read().decode('utf-16')
-        source_type = "visa"
-        source_type_id = str(decoded_file.split("\n")[1].split("המסתיים בספרות")[1].split(",")[0])
-        source = get_add_source(user=user, source_type_name=source_type, source_type_id=source_type_id)
+            for line in decoded_file.split('\n'):
 
-        for line in decoded_file.split('\n'):
+                transaction = self.parse_transaction(line, source=source, user=user)
+                if transaction != None:
+                    transactions.append(transaction)
 
-            transaction = self.parse_transaction(line, source=source, user=user)
-            if transaction != None:
-                transactions.append(transaction)
+            return transactions
+        except Exception as e:
+            return []
 
-        print(len(transactions))
-        return transactions
 
     def is_me(self, file):
         try:
