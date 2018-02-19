@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from expenses.common import UNTAGGED_SUBCATEGORY_TEXT
 from expenses.models import SubCategory, Category, Rule, RuleType
 
 
@@ -23,7 +24,7 @@ def categories_add(request):
         # Redisplay the transaction voting form.
         return render(request, 'expenses/categories', { 'error_message': "All fields mandatory",})
     else:
-        if text != '':
+        if text != '' and text != UNTAGGED_SUBCATEGORY_TEXT:
             category = Category(text=text, owner=request.user)
             category.save()
         return HttpResponseRedirect(reverse('expenses:categories'))
@@ -36,9 +37,9 @@ def sub_categories_add(request):
         category = Category.objects.get(pk=category_id, owner=request.user)
     except (KeyError, Category.DoesNotExist):
         # Redisplay the transaction voting form.
-        return render(request, 'expenses/categories', { 'error_message': "All fields mandatory",})
+        return render(request, 'expenses/categories', {'error_message': "All fields mandatory"})
     else:
-        if text != '':
+        if text != '' and text != UNTAGGED_SUBCATEGORY_TEXT:
             sub_category = SubCategory(text=text, category=category, owner=request.user)
             sub_category.save()
         return HttpResponseRedirect(reverse('expenses:categories'))
@@ -49,14 +50,25 @@ def categories_action(request):
     if request.POST['action'] == 'delete':
         for marked in marked_categories:
             category = Category.objects.get(pk=marked, owner=request.user)
-            category.delete()
+            if category.text != UNTAGGED_SUBCATEGORY_TEXT:
+                subcategories = [x.id for x in category.subcategory_set.filter(owner=request.user)]
+                delete_subcategories(request.user, subcategories)
+                category.delete()
     return HttpResponseRedirect(reverse('expenses:categories'))
+
+
+def delete_subcategories(user, subcategory_ids):
+    for marked in subcategory_ids:
+        sub_category = SubCategory.objects.get(pk=marked, owner=user)
+        if sub_category.text != UNTAGGED_SUBCATEGORY_TEXT:
+            transactions = sub_category.transaction_set.filter(owner=user)
+            notagging_subcategory = SubCategory.objects.get(owner=user, text=UNTAGGED_SUBCATEGORY_TEXT)
+            transactions.update(subcategory=notagging_subcategory)
+            sub_category.delete()
 
 
 def sub_categories_action(request):
     marked_sub_categories = request.POST.getlist('marked_checkbox_sub')
     if request.POST['action'] == 'delete':
-        for marked in marked_sub_categories:
-            sub_category = SubCategory.objects.get(pk=marked, owner=request.user)
-            sub_category.delete()
+        delete_subcategories(request.user, marked_sub_categories)
     return HttpResponseRedirect(reverse('expenses:categories'))

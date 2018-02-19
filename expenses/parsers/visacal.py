@@ -27,11 +27,11 @@ class VisaCalParser(object):
             return None
 
         merchant = splits[1]
-        amount = float(splits[3].split("₪")[0].replace(',',''))
+        amount = splits[3].split("₪")[0].replace(',','')
 
         if '-' in amount:
             amount = '-' + amount.replace('-','')
-
+        amount = float(amount)
         comment = ""
         if len(splits) == 5:
             comment = line.split("\t")[4]
