@@ -113,11 +113,19 @@
 
     <div class="row">
       <div class="actions">
-        <label>Action: <select name="action" required="">
+        <label>Action:
+          <select name="action" required="" onchange="showBulkUpdate(this)" id="actionId">
             <option value="" selected="">---------</option>
-            <option value="delete">Delete selected</option>
+            <option value="delete" id="delete">Delete selected</option>
+            <option value="bulk_update" id="bulk_update" >Change Subcategory</option>
           </select>
         </label>
+        <select name="bulk_subcategory" id="bulkSubcategoryId" required="" hidden >
+          <option value="" selected="">---------</option>
+          {% for sc in subcategories %}
+          <option id="{{sc.id}}" value="{{sc.id}}">{{ sc }}</option>
+          {% endfor %}
+        </select>
         <button type="submit" class="button" title="Run the selected action" name="index" value="0">Go</button>
       </div>
     </div>
@@ -233,6 +241,16 @@
             checkboxes[i].checked = source.checked;                                            
         }
     }
+
+    function showBulkUpdate(source) {
+      if ($("#actionId").find(":selected").attr("id") == "bulk_update") {
+        $("#bulkSubcategoryId").prop("hidden",false);
+      } else {
+        $("#bulkSubcategoryId").prop("hidden",true);
+      }
+
+    }
+
 </script>
 
 <script language="JavaScript">
@@ -248,8 +266,6 @@
 
 
   function save_subcategory(source, transaction_id, merchant) {
-
-
       var csrftoken = Cookies.get('csrftoken');
       var subcategory_id = $("#" + "subcategory_select_" + transaction_id).find(":selected").attr("id")
       $.ajax({

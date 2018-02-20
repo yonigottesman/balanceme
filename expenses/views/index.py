@@ -105,6 +105,15 @@ def index_action(request):
         for marked in marked_transactions:
             transaction = Transaction.objects.get(owner=request.user, pk=int(marked))
             transaction.delete()
+
+    if request.POST['action'] == 'bulk_update':
+        subcategory_id = request.POST['bulk_subcategory']
+        new_subcategory = SubCategory.objects.get(owner=request.user, pk=int(subcategory_id))
+        for marked in marked_transactions:
+            transaction = Transaction.objects.get(owner=request.user, pk=int(marked))
+            transaction.subcategory = new_subcategory
+            transaction.save()
+
     url = reverse('expenses:index') + "?startDate=" + start_date + "&endDate=" + end_date + '&source=' + source \
           + '&search' + search + '&category='+ category
     return HttpResponseRedirect(url)
