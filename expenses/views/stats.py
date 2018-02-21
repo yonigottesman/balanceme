@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from pygal.style import Style
 
+from expenses.common import UNTAGGED_SUBCATEGORY_TEXT, get_untagged_category
 from expenses.models import Transaction, Category
 from bokeh.plotting import figure, output_file, show
 from bokeh.embed import components
@@ -46,7 +47,6 @@ def stats_month_category(request, month, category_str):
         pie_chart.add(subcategory_object.text, [{'value':subcategory_sum,
                                                 'xlink': {'href': url, 'target': '_top'}}])
 
-
     pie_chart.title = month + " " + category_str + '\nTotal ' + str('{:20,d}'.format(int(total_sum))) + "₪"
 
     pie_chart.render()
@@ -75,46 +75,33 @@ def stats_month(request, month):
             subcategory_object = transaction.subcategory
 
         total_sum = total_sum + subcategory_sum
-        if subcategory_object is None:
-            category_id=-1
-            category_str = 'UnTagged'
-        else:
-            category_id = subcategory_object.category.id
-            category_str = str(subcategory_object.category)
+        category_id = subcategory_object.category.id
+        category_str = str(subcategory_object.category)
 
         if subcategory_object is None:
             subcategory_label = 'UnTagged'
         else:
             subcategory_label = str(subcategory_object)
 
-        url = request.build_absolute_uri(reverse('expenses:index') + "?startDate=" + start_date.strftime('%Y-%m-%d')
-                                         + "&endDate=" + end_date.strftime('%Y-%m-%d') + '&category='
-                                         + str(category_id))
-
-        subcategory_pie_map = {'value': int(subcategory_sum),'label': subcategory_label,'xlink':{'href': url, 'target': '_top'}}
+        subcategory_pie_map = {'value': int(subcategory_sum), 'label': subcategory_label}
         if category_str in pie_map:
             pie_map[category_str].append(subcategory_pie_map)
         else:
             pie_map[category_str] = [subcategory_pie_map]
 
-    custom_style = Style(
-        # background='transparent',
-        # plot_background='transparent',
-        # opacity='.6',
-        # opacity_hover='.9',
-        # transition='400ms ease-in',
-        tooltip_font_size=10
-        )
-
     pie_chart = pygal.Pie(Config)
     pie_chart.title = month + '\nTotal ' + str('{:20,d}'.format(int(total_sum))) + "₪"
     for category in pie_map:
         # pie_chart.add(category, pie_map[category])
-        url = request.build_absolute_uri(reverse('expenses:stats_month_category', kwargs={'month': month,'category_str': category}))
+        if category == UNTAGGED_SUBCATEGORY_TEXT:
+            url = request.build_absolute_uri(reverse('expenses:index') + "?startDate=" + start_date.strftime('%Y-%m-%d')
+                                             + "&endDate=" + end_date.strftime('%Y-%m-%d')
+                                             + '&category=' + str(get_untagged_category(request.user).id))
+        else:
+            url = request.build_absolute_uri(reverse('expenses:stats_month_category', kwargs={'month': month,'category_str': category}))
 
         pie_chart.add(category, [{'value':sum(x['value'] for x in pie_map[category]),
                                   'xlink':{'href': url, 'target': '_top'}}])
-
 
     pie_chart.render()
     pie_chart = pie_chart.render_data_uri()

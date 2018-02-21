@@ -100,6 +100,7 @@ def index_action(request):
     source = request.POST['source']
     search = request.POST['search']
     category = request.POST['category']
+    current_subcategory = request.POST['subcategory']
 
     if request.POST['action'] == 'delete':
         for marked in marked_transactions:
@@ -115,7 +116,7 @@ def index_action(request):
             transaction.save()
 
     url = reverse('expenses:index') + "?startDate=" + start_date + "&endDate=" + end_date + '&source=' + source \
-          + '&search' + search + '&category='+ category
+          + '&search' + search + '&category=' + category + '&subcategory=' + str(current_subcategory)
     return HttpResponseRedirect(url)
 
 
@@ -124,7 +125,7 @@ def save_post(request):
     subcategory_id = request.POST['subcategory_id']
 
     transaction = Transaction.objects.get(owner=request.user, pk=transaction_id)
-    new_subcategory = SubCategory.objects.get(owner=request.user, pk= subcategory_id)
+    new_subcategory = SubCategory.objects.get(owner=request.user, pk=subcategory_id)
 
     transaction.subcategory = new_subcategory
     transaction.save()
