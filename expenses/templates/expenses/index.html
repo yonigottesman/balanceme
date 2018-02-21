@@ -120,7 +120,7 @@
             <option value="bulk_update" id="bulk_update" >Change Subcategory</option>
           </select>
         </label>
-        <select name="bulk_subcategory" id="bulkSubcategoryId" required="" hidden >
+        <select name="bulk_subcategory" id="bulkSubcategoryId"  hidden >
           <option value="" selected="">---------</option>
           {% for sc in subcategories %}
           <option id="{{sc.id}}" value="{{sc.id}}">{{ sc }}</option>
@@ -245,8 +245,11 @@
     function showBulkUpdate(source) {
       if ($("#actionId").find(":selected").attr("id") == "bulk_update") {
         $("#bulkSubcategoryId").prop("hidden",false);
+        $("#bulkSubcategoryId").attr("required",true);
+        
       } else {
         $("#bulkSubcategoryId").prop("hidden",true);
+        $("#bulkSubcategoryId").attr("required",false);
       }
 
     }

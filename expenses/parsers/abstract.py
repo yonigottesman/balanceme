@@ -9,8 +9,8 @@ class FileParser(object):
         from .visacal import VisaCalParser
         from .poalimbank import PoalimBankParser
         from .mastercard import MastercardParser
-
-        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser()]
+        from .leumicard import LeumicardParser
+        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser(), LeumicardParser()]
 
     def factory(self, file):
 

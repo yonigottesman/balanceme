@@ -72,7 +72,7 @@ def index(request):
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
     page = request.GET.get('page')
     transactions = paginator.get_page(page)
-    input_source_list = InputSource.objects.all()
+    input_source_list = InputSource.objects.filter(owner=request.user)
     context = {'transactions':  transactions,
                'startDate': start_date, 'endDate': end_date,
                'inputSources': input_source_list,
