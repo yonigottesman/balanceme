@@ -49,7 +49,7 @@ def stats_category(request, category):
     category = Category.objects.get(owner=request.user, pk=category)
 
     transactions = Transaction.objects.filter(owner=request.user, subcategory__category=category).order_by('-subcategory')
-    url_params = '?category=' + str(category)
+    url_params = '?category=' + str(category.id)
 
     if search_text is not None:
         transactions = transactions.filter(Q(merchant__icontains=search_text) | Q(comment__icontains=search_text))
