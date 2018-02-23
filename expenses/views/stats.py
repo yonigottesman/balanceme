@@ -18,8 +18,8 @@ from django.shortcuts import render, render_to_response
 
 def stats_manual(request):
     try:
-        start_date = request.POST['startDate']
-        end_date = request.POST['endDate']
+        start_date = get_datetime(request.POST['startDate'])
+        end_date = get_datetime(request.POST['endDate'])
         source = request.POST['source']
         search = request.POST['search']
 
