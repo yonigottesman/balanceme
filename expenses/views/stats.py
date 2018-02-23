@@ -60,7 +60,7 @@ def stats_category(request, category):
     if end_date is not None:
         transactions = transactions.filter(date__lte=end_date)
         url_params = url_params + "&endDate=" + end_date.strftime('%Y-%m-%d')
-    if input_source is not None:
+    if input_source is not None and input_source is not 'all':
         url_params = url_params + "&source=" + input_source
         transactions = transactions.filter(source_id=int(input_source))
 
