@@ -1,5 +1,5 @@
-from expenses.common import UNTAGGED_SUBCATEGORY_TEXT, ANYTEXT_CONTAINS_RULE_TEXT
-from expenses.models import InputSource, Transaction, Category, SubCategory, Rule
+from expenses.common import UNTAGGED_SUBCATEGORY_TEXT
+from expenses.models import InputSource, Transaction, SubCategory, Rule
 
 
 
@@ -10,7 +10,8 @@ class FileParser(object):
         from .poalimbank import PoalimBankParser
         from .mastercard import MastercardParser
         from .leumicard import LeumicardParser
-        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser(), LeumicardParser()]
+        from expenses.parsers.leumibabk import LeumiBankParser
+        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser(), LeumicardParser(), LeumiBankParser()]
 
     def factory(self, file):
 

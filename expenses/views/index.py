@@ -7,6 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 import dateutil.parser
 
+from expenses.common import get_datetime
 from expenses.models import Transaction, Category, InputSource, SubCategory, Rule, RuleType
 
 from django.core.paginator import Paginator
@@ -30,13 +31,13 @@ def filter_index(request):
         return HttpResponseRedirect(url)
 
 
-def get_datetime(date_str):
-    try:
-        date = datetime.strptime(date_str, '%Y-%m-%d')
-    except (ValueError, TypeError) as e:
-        return None
-    else:
-        return date
+# def get_datetime(date_str):
+#     try:
+#         date = datetime.strptime(date_str, '%Y-%m-%d')
+#     except (ValueError, TypeError) as e:
+#         return None
+#     else:
+#         return date
 
 
 def index(request):

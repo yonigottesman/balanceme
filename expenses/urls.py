@@ -12,8 +12,10 @@ urlpatterns = [
     path('stats', views.stats, name='stats'),
     path('save_post/', views.save_post, name='save_post'),
 
+    path('stats/<int:category>', views.stats_category, name='stats_category'),
     path('stats/<str:month>', views.stats_month, name='stats_month'),
-    path('stats/<str:month>/<str:category_str>', views.stats_month_category, name='stats_month_category'),
+
+    path('stats_manual', views.stats_manual, name='stats_manual'),
 
     #TODO what is name convention for post path?
     path('add_txn_post', views.add_txn_post, name='add_txn_post'),

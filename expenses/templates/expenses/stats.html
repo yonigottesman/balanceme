@@ -1,5 +1,56 @@
 {% extends "expenses/base.html" %}
-{% block content %}  
+{% block content %}
+
+<div class="container ">
+  <form action="{% url 'expenses:stats_manual' %}" method="post">
+
+    {% csrf_token %}
+    <div class="row">
+
+      <div class="form-group col-md-3">
+        <label for="date">Start Date</label>
+        <input type="date" class="form-control" id="startDate" name="startDate" value="{{startDate}}">
+      </div>
+
+      <div class="form-group col-md-3">
+        <label for="date">End Date</label>
+        <input type="date" class="form-control" id="endDate" name="endDate" value="{{endDate}}">
+      </div>
+
+      <div class="form-group col-md-3">
+        <label for="inputSource">Source</label>
+        <select id="source" class="form-control" name="source">
+          <option value="all">All</option>
+          {% for s in inputSources %}
+          {% if s.id == source %}
+          <option  value="{{s.id}}" selected > {{s}}</option>
+          {% else %}
+          <option  value="{{s.id}}" > {{ s }}</option>
+
+          {% endif %}
+
+          {% endfor %}
+        </select>
+      </div>
+
+
+      <div class="form-group col-md-3">
+
+        <label for="search">Contains Text</label>
+        <div class="input-group mb-2">
+          {% if search and search != 'None' %}
+          <input type="text" class="form-control" id="search" name="search" value="{{search}}">
+          {% else %}
+          <input type="text" class="form-control" id="search" name="search">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Statistics</button>
+  </form>
+</div>
+
+
 <div class="container">
   <div id="chart">
     <embed type="image/svg+xml" src= {{ chart|safe }} />
