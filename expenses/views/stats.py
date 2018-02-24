@@ -22,17 +22,19 @@ def stats_manual(request):
         end_date = get_datetime(request.POST['endDate'])
         source = request.POST['source']
         search = request.POST['search']
+        exclude = request.POST.getlist('exclude')
 
     except KeyError:
         # Redisplay the transaction voting form.
         return render(request, 'expenses/stats.html', {})
     else:
         pie_chart = category_piechart(request=request, start_date=start_date, end_date=end_date,
-                                      search_text=search, input_source=source)
+                                      search_text=search, input_source=source, exclude=exclude)
 
-        context = {'chart': pie_chart}
+        context = {'chart': pie_chart,
+                   }
         return render(request, 'expenses/stats.html', context)
-        pass
+
 
 
 def stats_category(request, category):
@@ -51,6 +53,11 @@ def stats_category(request, category):
     transactions = Transaction.objects.filter(owner=request.user, subcategory__category=category).order_by('-subcategory')
     url_params = '?category=' + str(category.id)
 
+    if start_date is None:
+        start_date = datetime.today() - dateutil.relativedelta.relativedelta(months=12)
+    if end_date is None:
+        end_date = datetime.today()
+
     if search_text is not None:
         transactions = transactions.filter(Q(merchant__icontains=search_text) | Q(comment__icontains=search_text))
         url_params = url_params + '&search=' + search_text
@@ -63,7 +70,6 @@ def stats_category(request, category):
     if input_source is not None and input_source != 'all':
         url_params = url_params + "&source=" + input_source
         transactions = transactions.filter(source_id=int(input_source))
-
 
     total_sum = 0
     pie_chart = pygal.Pie(Config)
@@ -82,15 +88,22 @@ def stats_category(request, category):
 
     pie_chart.render()
     pie_chart = pie_chart.render_data_uri()
-    context = {'chart': pie_chart}
+    context = {'chart': pie_chart,
+               'inputSources': InputSource.objects.filter(owner=request.user),
+               'categories': Category.objects.filter(owner=request.user)}
 
     return render(request, 'expenses/stats.html', context)
 
 
-def category_piechart(request, start_date, end_date, search_text, input_source):
+def category_piechart(request, start_date, end_date, search_text, input_source, exclude):
 
     transactions = Transaction.objects.filter(owner=request.user).order_by('-subcategory')
     url_params = '?category=' + str(get_untagged_category(request.user).id)
+
+    if start_date is None:
+        start_date = datetime.today() - dateutil.relativedelta.relativedelta(months=12)
+    if end_date is None:
+        end_date = datetime.today()
 
     if search_text is not None:
         transactions = transactions.filter(Q(merchant__icontains=search_text) | Q(comment__icontains=search_text))
@@ -104,6 +117,9 @@ def category_piechart(request, start_date, end_date, search_text, input_source):
     if input_source is not None and input_source != 'all':
         url_params = url_params + "&source=" + input_source
         transactions = transactions.filter(source_id=int(input_source))
+    if exclude is not None:
+        for category in exclude:
+            transactions = transactions.exclude(subcategory__category__id=category)
 
     config = pygal.Config()
     config.tooltip_fancy_mode = False
@@ -140,9 +156,12 @@ def stats_month(request, month):
     end_date = start_date + dateutil.relativedelta.relativedelta(months=1) + timedelta(-1)
 
     pie_chart = category_piechart(request=request,start_date=start_date, end_date=end_date,
-                                  search_text=None, input_source=None)
+                                  search_text=None, input_source=None, exclude=None)
 
-    context = {'chart': pie_chart}
+
+    context = {'chart': pie_chart,
+               'inputSources': InputSource.objects.filter(owner=request.user),
+               'categories': Category.objects.filter(owner=request.user)}
 
     return render(request, 'expenses/stats.html', context)
 
@@ -177,9 +196,10 @@ def stats(request):
     chart.add(None, bar_list)
 
     chart = chart.render_data_uri(force_uri_protocol='https')
-    input_sources = InputSource.objects.filter(owner=request.user)
+
     context = {'chart': chart,
-               'inputSources': input_sources}
+               'inputSources': InputSource.objects.filter(owner=request.user),
+               'categories': Category.objects.filter(owner=request.user)}
 
     return render(request, 'expenses/stats.html', context)
 
