@@ -47,7 +47,4 @@ def add_txn_file_post(request):
         for txn in transactions:
             txn.save()
 
-
-
-
         return HttpResponseRedirect(reverse('expenses:index'))

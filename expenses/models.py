@@ -56,5 +56,8 @@ class RuleType(models.Model):
 class Rule(models.Model):
     rule_type = models.ForeignKey(RuleType, on_delete=models.CASCADE, null=True)
     value = models.CharField(max_length=200)
-    subCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    subCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def apply(self, transaction):
+        pass

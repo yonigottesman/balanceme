@@ -21,6 +21,7 @@
         <select id="add_rule_subcategory">
           <!-- <option id="-1" selected="">---------</option>           -->
           {% for sc in subcategories %}
+          <option value="delete" id="delete">DELETE</option>
           <option id="{{sc.id}}" value="{{sc.id}}">{{ sc }}</option>
           {% endfor %}
         </select>        
@@ -110,6 +111,7 @@
     <input name="search" type="hidden" value="{{search}}" />
     <input name="category" type="hidden" value="{{category}}" />
     <input name="subcategory" type="hidden" value="{{subcategory}}" />
+    <input name="page" type="hidden" value="{{transactions.number }}" />
 
     <div class="row">
       <div class="actions">
@@ -159,6 +161,7 @@
             <td>
 
               <select id="subcategory_select_{{transaction.id}}" onchange="show_save(this, {{transaction.id}})">
+                <option value="delete" id="delete">DELETE</option>
                 {% for sc in subcategories %}
                 {% if sc == transaction.subcategory%}
                 <option id="{{sc.id}}"  selected>{{ sc }}</option>

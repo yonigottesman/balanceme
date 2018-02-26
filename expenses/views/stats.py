@@ -18,8 +18,8 @@ from django.shortcuts import render, render_to_response
 
 def stats_manual(request):
     try:
-        start_date = get_datetime(request.POST['startDate'])
-        end_date = get_datetime(request.POST['endDate'])
+        start_date = request.POST['startDate']
+        end_date = request.POST['endDate']
         source = request.POST['source']
         search = request.POST['search']
         exclude = request.POST.getlist('exclude')
@@ -28,19 +28,22 @@ def stats_manual(request):
         # Redisplay the transaction voting form.
         return render(request, 'expenses/stats.html', {})
     else:
-        pie_chart = category_piechart(request=request, start_date=start_date, end_date=end_date,
+        pie_chart = category_piechart(request=request, start_date=(start_date), end_date=(end_date),
                                       search_text=search, input_source=source, exclude=exclude)
 
         context = {'chart': pie_chart,
-                   }
+                   'startDate': start_date, 'endDate': end_date,
+                   'inputSources': InputSource.objects.filter(owner=request.user),
+                   'categories': Category.objects.filter(owner=request.user)}
+
         return render(request, 'expenses/stats.html', context)
 
 
 
 def stats_category(request, category):
 
-    start_date = get_datetime(request.GET.get('startDate'))
-    end_date = get_datetime(request.GET.get('endDate'))
+    start_date = (request.GET.get('startDate'))
+    end_date = (request.GET.get('endDate'))
     input_source = request.GET.get('source')
     search_text= request.GET.get('search')
 
@@ -62,11 +65,11 @@ def stats_category(request, category):
         transactions = transactions.filter(Q(merchant__icontains=search_text) | Q(comment__icontains=search_text))
         url_params = url_params + '&search=' + search_text
     if start_date is not None:
-        transactions = transactions.filter(date__gte=start_date)
-        url_params = url_params + "&startDate=" + start_date.strftime('%Y-%m-%d')
+        transactions = transactions.filter(date__gte=get_datetime(start_date))
+        url_params = url_params + "&startDate=" + start_date
     if end_date is not None:
-        transactions = transactions.filter(date__lte=end_date)
-        url_params = url_params + "&endDate=" + end_date.strftime('%Y-%m-%d')
+        transactions = transactions.filter(date__lte=get_datetime(end_date))
+        url_params = url_params + "&endDate=" + end_date
     if input_source is not None and input_source != 'all':
         url_params = url_params + "&source=" + input_source
         transactions = transactions.filter(source_id=int(input_source))
@@ -89,6 +92,7 @@ def stats_category(request, category):
     pie_chart.render()
     pie_chart = pie_chart.render_data_uri()
     context = {'chart': pie_chart,
+               'startDate': start_date, 'endDate': end_date,
                'inputSources': InputSource.objects.filter(owner=request.user),
                'categories': Category.objects.filter(owner=request.user)}
 
@@ -109,11 +113,11 @@ def category_piechart(request, start_date, end_date, search_text, input_source, 
         transactions = transactions.filter(Q(merchant__icontains=search_text) | Q(comment__icontains=search_text))
         url_params=url_params+'&search='+search_text
     if start_date is not None:
-        transactions = transactions.filter(date__gte=start_date)
-        url_params = url_params + "&startDate=" + start_date.strftime('%Y-%m-%d')
+        transactions = transactions.filter(date__gte=get_datetime(start_date))
+        url_params = url_params + "&startDate=" + start_date
     if end_date is not None:
-        transactions = transactions.filter(date__lte=end_date)
-        url_params = url_params + "&endDate=" + end_date.strftime('%Y-%m-%d')
+        transactions = transactions.filter(date__lte=get_datetime(end_date))
+        url_params = url_params + "&endDate=" + end_date
     if input_source is not None and input_source != 'all':
         url_params = url_params + "&source=" + input_source
         transactions = transactions.filter(source_id=int(input_source))
@@ -129,7 +133,6 @@ def category_piechart(request, start_date, end_date, search_text, input_source, 
     total_sum = 0
     for category, category_list in groupby(transactions, lambda x: x.subcategory.category):
 
-
         category_sum = sum([txn.amount for txn in category_list])
         total_sum = total_sum + category_sum
 
@@ -141,7 +144,7 @@ def category_piechart(request, start_date, end_date, search_text, input_source, 
         pie_chart.add(category.text, [{'value':category_sum,
                                   'xlink': {'href': url, 'target': '_top'}}])
 
-    pie_chart.title = start_date.strftime('%Y-%m-%d') + "   <->   " + end_date.strftime('%Y-%m-%d')\
+    pie_chart.title = start_date + "   <->   " + end_date\
                       + '\nTotal ' + str('{:20,d}'.format(int(total_sum))) + "₪"
 
     pie_chart.render()
@@ -152,14 +155,15 @@ def category_piechart(request, start_date, end_date, search_text, input_source, 
 def stats_month(request, month):
 
     date = datetime.strptime(month, '%b %Y')
-    start_date = date.replace(day=1)
-    end_date = start_date + dateutil.relativedelta.relativedelta(months=1) + timedelta(-1)
+    start_date = date.replace(day=1).strftime('%Y-%m-%d')
+    end_date = (date.replace(day=1) + dateutil.relativedelta.relativedelta(months=1) + timedelta(-1)).strftime('%Y-%m-%d')
 
     pie_chart = category_piechart(request=request,start_date=start_date, end_date=end_date,
                                   search_text=None, input_source=None, exclude=None)
 
 
     context = {'chart': pie_chart,
+               'startDate': start_date, 'endDate': end_date,
                'inputSources': InputSource.objects.filter(owner=request.user),
                'categories': Category.objects.filter(owner=request.user)}
 

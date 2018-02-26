@@ -20,11 +20,15 @@ def rules(request):
 def rules_add(request):
     try:
         value = request.POST['value']
-        subcategory = SubCategory.objects.get(owner=request.user, pk=request.POST['subcategory_id'])
+        move_to = request.POST['subcategory_id']
+        subcategory = None
+        if move_to != 'delete':
+            subcategory = SubCategory.objects.get(owner=request.user, pk=move_to)
         # rule_type = RuleType.objects.get(pk=request.POST['rule_type_id'])
     except (KeyError, SubCategory.DoesNotExist) as e:
         return render(request, 'expenses/categories', {'error_message': "All fields mandatory",})
     else:
+
         new_rule = Rule(owner=request.user, rule_type=None, subCategory=subcategory, value=value)
         new_rule.save()
         apply_rule(new_rule, request.user)
@@ -36,8 +40,11 @@ def apply_rule(rule, user):
     transactions = Transaction.objects.filter(owner=user)\
         .filter(Q(merchant__icontains=rule.value) | Q(comment__icontains=rule.value))
     for transaction in transactions:
-        transaction.subcategory = rule.subCategory
-        transaction.save()
+        if rule.subCategory is None:
+            transaction.delete()
+        else:
+            transaction.subcategory = rule.subCategory
+            transaction.save()
 
 
 def rules_action(request):

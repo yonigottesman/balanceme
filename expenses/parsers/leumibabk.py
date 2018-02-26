@@ -36,12 +36,13 @@ class LeumiBankParser(object):
                 comment = ''
                 amount = float(row['חובה'])
 
-                transaction = Transaction.create(comment=comment, merchant=merchant, date=date,
-                                                 amount=amount, source=source,
-                                                 subcategory=get_subcategory(user=user, comment=comment,
-                                                 merchant=merchant), user=user)
-
+            subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
+            if subcategory is not None:
+                transaction = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount,
+                                                 source=source,
+                                                 subcategory=subcategory, user=user)
                 transactions.append(transaction)
+
             return transactions
         except Exception as e:
             return []
