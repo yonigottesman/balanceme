@@ -56,10 +56,10 @@ def stats_category(request, category):
     transactions = Transaction.objects.filter(owner=request.user, subcategory__category=category).order_by('-subcategory')
     url_params = '?category=' + str(category.id)
 
-    if start_date is None:
-        start_date = datetime.today() - dateutil.relativedelta.relativedelta(months=12)
-    if end_date is None:
-        end_date = datetime.today()
+    if start_date is None  or start_date == '':
+        start_date = (datetime.today() - dateutil.relativedelta.relativedelta(months=12)).strftime('%Y-%m-%d')
+    if end_date is None or end_date == '':
+        end_date = datetime.today().strftime('%Y-%m-%d')
 
     if search_text is not None:
         transactions = transactions.filter(Q(merchant__icontains=search_text) | Q(comment__icontains=search_text))
@@ -104,10 +104,10 @@ def category_piechart(request, start_date, end_date, search_text, input_source, 
     transactions = Transaction.objects.filter(owner=request.user).order_by('-subcategory')
     url_params = '?category=' + str(get_untagged_category(request.user).id)
 
-    if start_date is None:
-        start_date = datetime.today() - dateutil.relativedelta.relativedelta(months=12)
-    if end_date is None:
-        end_date = datetime.today()
+    if start_date is None or start_date == '':
+        start_date = (datetime.today() - dateutil.relativedelta.relativedelta(months=12)).strftime('%Y-%m-%d')
+    if end_date is None or end_date == '':
+        end_date = datetime.today().strftime('%Y-%m-%d')
 
     if search_text is not None:
         transactions = transactions.filter(Q(merchant__icontains=search_text) | Q(comment__icontains=search_text))
