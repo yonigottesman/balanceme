@@ -37,6 +37,7 @@ class VisaCalParser(object):
             comment = line.split("\t")[4]
 
         subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
+        tx = None
         if subcategory is not None:
             tx = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
                                     subcategory=subcategory, user=user)
