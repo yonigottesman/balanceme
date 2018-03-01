@@ -24,15 +24,22 @@ class LeumiBankParser(object):
             transactions = []
             file.file.seek(0)
             table = pd.read_excel(file, skiprows=21).to_dict('records')
+        except Exception as e:
+                return []
 
-            for row in table:
+        for row in table:
+            try:
                 if str(row['חובה']) == 'nan':
                     continue
-                date = row['תאריך '].date()
-                if date.day <= 12:
-                    tmp = date.day
-                    date = date.replace(day=date.month)
-                    date = date.replace(month=tmp)
+
+                if type(row['תאריך ']) == type('string'):
+                    date =  datetime.strptime(row['תאריך '], '%d/%m/%y')
+                else:
+                    date = row['תאריך '].date()
+                    if date.day <= 12:
+                        tmp = date.day
+                        date = date.replace(day=date.month)
+                        date = date.replace(month=tmp)
 
                 merchant = row['תיאור']
                 if self.is_visa_transaction(merchant) and self.ignore_visa_transactions:
@@ -44,13 +51,14 @@ class LeumiBankParser(object):
                 subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
                 if subcategory is not None:
                     transaction = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount,
-                                                     source=source,
-                                                     subcategory=subcategory, user=user)
+                    source=source,
+                    subcategory=subcategory, user=user)
+
                     transactions.append(transaction)
 
-            return transactions
-        except Exception as e:
-            return []
+            except Exception:
+                    continue
+        return transactions
 
     def is_me(self, file):
         try:
