@@ -39,6 +39,7 @@ class MastercardParser(object):
             return []
 
     def is_me(self, file):
+        return False
         try:
             table = pd.read_excel(file).to_dict('records')
             if 'מסטרקארד' in table[1][(list(table[1].keys())[0])]:

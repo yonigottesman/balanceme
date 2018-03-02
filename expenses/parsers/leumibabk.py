@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from bs4 import BeautifulSoup
+
 from expenses.models import Transaction
 import pandas as pd
 from .abstract import get_add_source, get_subcategory
@@ -16,37 +18,35 @@ class LeumiBankParser(object):
 
     def get_transactions(self, file, user):
         try:
+            html = file.read()
+            parsed_html = BeautifulSoup(html, "html.parser")
             source_type_name = 'Leumi Bank'
-            tmp = pd.read_excel(file, skiprows=0).to_dict('records')
-            source_type_id = list(tmp[2].values())[0].split('חשבון: ')[1]
+            source_type_id = \
+            parsed_html.find_all(class_="exportDataFilterForPrint")[0].find_all('tr')[0].find_all('td')[0].find_all(
+                'span')[6].get_text()
             source = get_add_source(user=user, source_type_name=source_type_name, source_type_id=source_type_id)
 
             transactions = []
-            file.file.seek(0)
-            table = pd.read_excel(file, skiprows=21).to_dict('records')
-        except Exception as e:
-                return []
 
-        for row in table:
-            try:
-                if str(row['חובה']) == 'nan':
+            table = parsed_html.find(id='ctlActivityTable')
+            for row in table:
+
+                amount = (row.find_all(class_='AmountDebitUniqeClass')[0].get_text().strip())
+                if amount == '':
                     continue
-
-                if type(row['תאריך ']) == type('string'):
-                    date =  datetime.strptime(row['תאריך '], '%d/%m/%y')
                 else:
-                    date = row['תאריך '].date()
-                    if date.day <= 12:
-                        tmp = date.day
-                        date = date.replace(day=date.month)
-                        date = date.replace(month=tmp)
+                    amount = float(amount.replace(',',''))
 
-                merchant = row['תיאור']
-                if self.is_visa_transaction(merchant) and self.ignore_visa_transactions:
-                    continue
+                date = row.find_all(class_='ExtendedActivityColumnDate')[0].get_text().strip()
+                date = datetime.strptime(date, '%d/%m/%y')
+
+                merchant = row.find_all(class_='ActivityTableColumn1LTR')
+                if len(merchant) == 0:
+                    merchant = row.find_all(class_='ActivityTableColumn1')[0].find_all('a')[0].get_text().strip()
+                else:
+                    merchant = merchant[0].get_text().strip()
 
                 comment = ''
-                amount = float(row['חובה'])
 
                 subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
                 if subcategory is not None:
@@ -55,14 +55,18 @@ class LeumiBankParser(object):
                     subcategory=subcategory, user=user)
 
                     transactions.append(transaction)
+        except Exception as e:
+                return []
 
-            except Exception:
-                    continue
         return transactions
 
     def is_me(self, file):
         try:
-            bank_line = list(pd.read_excel(file, skiprows=0).to_dict('records')[0].keys())[0]
+            html = file.read()
+            parsed_html = BeautifulSoup(html, "html.parser")
+            bank_line = parsed_html.find_all(class_='PageTitle')[0].get_text()
+
+
             if bank_line == 'בנק לאומי - תנועות בחשבון':
                 return True
         except Exception:

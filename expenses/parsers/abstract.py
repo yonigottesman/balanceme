@@ -11,7 +11,8 @@ class FileParser(object):
         from .mastercard import MastercardParser
         from .leumicard import LeumicardParser
         from expenses.parsers.leumibabk import LeumiBankParser
-        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser(), LeumicardParser(), LeumiBankParser()]
+        from expenses.parsers.LeumiBankCards import LeumiBankCardsParser
+        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser(), LeumicardParser(), LeumiBankParser(),LeumiBankCardsParser()]
 
     def factory(self, file):
 
