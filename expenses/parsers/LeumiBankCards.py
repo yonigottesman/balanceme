@@ -47,7 +47,7 @@ class LeumiBankCardsParser(object):
                         transactions.append(transaction)
 
         except Exception as e:
-                return []
+                return None
 
         return transactions
 

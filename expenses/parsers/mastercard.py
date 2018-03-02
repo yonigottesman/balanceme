@@ -36,7 +36,7 @@ class MastercardParser(object):
 
             return transactions
         except Exception as e:
-            return []
+            return None
 
     def is_me(self, file):
         try:

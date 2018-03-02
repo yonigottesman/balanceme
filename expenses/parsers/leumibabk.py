@@ -29,7 +29,7 @@ class LeumiBankParser(object):
             transactions = []
 
             table = parsed_html.find(id='ctlActivityTable')
-            for row in table:
+            for row in table.find_all(class_='ExtendedActivity_ForPrint'):
 
                 amount = (row.find_all(class_='AmountDebitUniqeClass')[0].get_text().strip())
                 if amount == '':
@@ -56,7 +56,7 @@ class LeumiBankParser(object):
 
                     transactions.append(transaction)
         except Exception as e:
-                return []
+                return None
 
         return transactions
 
