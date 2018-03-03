@@ -101,7 +101,7 @@ def stats_category(request, category):
 
 def category_piechart(request, start_date, end_date, search_text, input_source, exclude):
 
-    transactions = Transaction.objects.filter(owner=request.user).order_by('-subcategory')
+    transactions = Transaction.objects.filter(owner=request.user).order_by('-subcategory__category__id')
     url_params = '?category=' + str(get_untagged_category(request.user).id)
 
     if start_date is None or start_date == '':
