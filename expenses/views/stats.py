@@ -53,7 +53,7 @@ def stats_category(request, category):
 
     category = Category.objects.get(owner=request.user, pk=category)
 
-    transactions = Transaction.objects.filter(owner=request.user, subcategory__category=category).order_by('-subcategory')
+    transactions = Transaction.objects.filter(owner=request.user, subcategory__category=category).order_by('-subcategory__category__id')
     url_params = '?category=' + str(category.id)
 
     if start_date is None  or start_date == '':
