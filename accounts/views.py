@@ -7,14 +7,14 @@ from expenses.common import UNTAGGED_SUBCATEGORY_TEXT
 from expenses.models import Category, SubCategory, RuleType, Rule
 
 DEFAULT_CATEGORIES = {'Supplies': ['Groceries', 'Cosmetics'],
-                      'Recreational':['Restaurants', 'Going Out'],
+                      'Recreational':['Restaurants', 'Going Out', 'Books/Games/Apps', 'Treats'],
                       'Bills': ['Gas/Electricity/Water', 'Internet/Cellular/TV'],
                       'Housing': ['House Committee', 'Rent','Property Tax'],
                       'Education': ['Higher Education'],
                       'Fitness': ['Sport Class'],
                       'Cash Withdraw':['Cash Withdraw'],
                       'Clothing': ['Clothing'],
-                      'House Stuff': ['Electronics', 'Furniture'],
+                      'House Stuff': ['Electronics', 'Furniture', 'House Stuff'],
                       'Vacation': ['Vacation'],
                       'Other': ['Presents', 'Other'],
                       'Services': ['Services'],

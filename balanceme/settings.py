@@ -20,7 +20,7 @@ LOGIN_REDIRECT_URL = '/expenses'
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$*tmd0!%if-n$1=%=^^l-&iwa)jx^&&4=wch!*%#k&v4n%2gz4'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'fake key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
