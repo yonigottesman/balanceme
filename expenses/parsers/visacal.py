@@ -1,9 +1,8 @@
-import time
 
-from expenses.models import Transaction, InputSource
 import dateutil.parser
+import sys
 
-from expenses.parsers.abstract import get_add_source, get_subcategory
+from expenses.parsers.abstract import get_add_source, create_transaction
 
 
 class VisaCalParser(object):
@@ -36,11 +35,8 @@ class VisaCalParser(object):
         if len(splits) == 5:
             comment = line.split("\t")[4]
 
-        subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
-        tx = None
-        if subcategory is not None:
-            tx = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount, source=source,
-                                    subcategory=subcategory, user=user)
+        tx = create_transaction(comment=comment, merchant=merchant, date=date, amount=amount, source=source, user=user)
+
         return tx
 
     def get_transactions(self, file, user):
@@ -58,7 +54,9 @@ class VisaCalParser(object):
                     transactions.append(transaction)
 
             return transactions
+
         except Exception as e:
+            sys.stderr.write(e)
             return None
 
 

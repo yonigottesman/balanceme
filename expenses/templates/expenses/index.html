@@ -6,7 +6,19 @@
 
 <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog" backdrop="false">
-  <div class="modal-dialog modal-sm">
+
+
+  <script language="JavaScript">
+    function toggle_advanced(source) {
+    new_val = !$("#add_rule_amount_div").prop("hidden")
+      $("#add_rule_source_div").prop("hidden",new_val);
+      $("#add_rule_day_div").prop("hidden",new_val);
+      $("#add_rule_amount_div").prop("hidden",new_val);
+    }
+  </script>
+
+
+  <div class="modal-dialog modal-md">
 
     <!-- Modal content-->
     <div class="modal-content">
@@ -15,20 +27,83 @@
         <h4 class="modal-title">New rule</h4>
       </div>
       <div class="modal-body">
-        <label for="date">Text Contains</label>
-        <input type="text" class="form-control" id="add_rule_text" name="add_rule_text" value="">
+
+
+        <div class="container">
+          <div class="row">
+            <div class="col-sm">
+              <label for="date">Text Contains:</label>
+            </div>
+            <div class="col-xl">
+              <input type="text" class="form-control" id="add_rule_text" name="add_rule_text" value="" placeholder="Any">
+            </div>
+          </div>
+
+          <div class="row" hidden id="add_rule_day_div">
+            <div class="col-sm">
+              <label for="date">Day of month:</label>
+
+            </div>
+            <div class="col-sm" >
+              <select id="add_rule_day">
+                {% for i in "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" %}
+                {% if forloop.counter0 == 0%}
+                <option id="{{ forloop.counter0 }}" value="{{ forloop.counter0 }}">Any</option>
+                {% else %}
+                <option id="{{ forloop.counter0 }}" value="{{ forloop.counter0 }}">{{ forloop.counter0 }}</option>
+                {% endif %}
+
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row" hidden id="add_rule_amount_div">
+            <div class="col-sm">
+              <label>Exact amount:</label>
+            </div>
+            <div class="col-sm">
+              <input type="number" class="form-control" id="add_rule_amount" name="add_rule_amount" placeholder="Any">
+            </div>
+          </div>
+
+          <div class="row" hidden id="add_rule_source_div">
+
+            <div class="col-sm">
+              <label for="inputSource">Source:</label>
+            </div>
+            <div class="col-sm">
+              <select id="add_rule_source" class="form-control" name="source">
+                <option id="Any">Any</option>
+                {% for s in inputSources %}
+                <option  id="{{s.id}}" > {{ s }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm">
+              <label for="date">Subcategory</label>
+            </div>
+            <div class="col-sm">
+              <select id="add_rule_subcategory">
+                <option value="delete" id="delete">DELETE</option>
+                {% for sc in subcategories %}
+                <option id="{{sc.id}}" value="{{sc.id}}">{{ sc }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
         <br>
-        <select id="add_rule_subcategory">
-          <!-- <option id="-1" selected="">---------</option>           -->
-          {% for sc in subcategories %}
-          <option value="delete" id="delete">DELETE</option>
-          <option id="{{sc.id}}" value="{{sc.id}}">{{ sc }}</option>
-          {% endfor %}
-        </select>        
-        <button type="button" class="btn btn-info btn-sm" onClick="add_rule(this)" >Save</button>
+
+        <button type="button" class="btn btn-info btn-sm" onClick="toggle_advanced(this)" >advanced</button>
+
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary mr-auto" onClick="add_rule(this)">Save Rule</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
 
@@ -307,7 +382,11 @@
           url: '/expenses/rules_add',
           data: {
               'value': $("#add_rule_text").val(),
-              'subcategory_id': $("#add_rule_subcategory").find(":selected").attr("id")
+              'subcategory_id': $("#add_rule_subcategory").find(":selected").attr("id"),
+              'source_id': $("#add_rule_source").find(":selected").attr("id"),
+              'amount': $("#add_rule_amount").val(),
+              'day': $("#add_rule_day").val()
+
           },
           beforeSend: function(xhr, settings) {
               if (!csrfSafeMethod(settings.type) && !this.crossDomain) {

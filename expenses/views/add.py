@@ -1,10 +1,10 @@
-import time
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from expenses.models import SubCategory
-from expenses.parsers.abstract import FileParser, remove_existing
+from expenses.models import SubCategory, Transaction
+from expenses.parsers.abstract import FileParser
 
 
 def add(request):
@@ -49,3 +49,25 @@ def add_txn_file_post(request):
             txn.save()
 
         return HttpResponseRedirect(reverse('expenses:index'))
+
+
+# TODO check efficiency of this function
+def remove_existing(new_transactions):
+    if len(new_transactions) is 0:
+        return new_transactions
+
+    without_duplicates = []
+    for transaction in new_transactions:
+
+        found = Transaction.objects \
+            .filter(owner=transaction.owner) \
+            .filter(comment=transaction.comment)\
+            .filter(merchant=transaction.merchant)\
+            .filter(amount=transaction.amount)\
+            .filter(source=transaction.source)\
+            .filter(date=transaction.date)
+
+        if len(found) == 0:
+            without_duplicates.append(transaction)
+
+    return without_duplicates

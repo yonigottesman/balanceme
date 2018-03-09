@@ -1,6 +1,5 @@
-from expenses.common import UNTAGGED_SUBCATEGORY_TEXT
-from expenses.models import InputSource, Transaction, SubCategory, Rule
-
+from expenses.common import get_untagged_subcategory
+from expenses.models import InputSource, Transaction, Rule
 
 
 class FileParser(object):
@@ -12,7 +11,8 @@ class FileParser(object):
         from .leumicard import LeumicardParser
         from expenses.parsers.leumibabk import LeumiBankParser
         from expenses.parsers.LeumiBankCards import LeumiBankCardsParser
-        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser(), LeumicardParser(), LeumiBankParser(),LeumiBankCardsParser()]
+        self.parsers = [VisaCalParser(), PoalimBankParser(), MastercardParser(),
+                        LeumicardParser(), LeumiBankParser(),LeumiBankCardsParser()]
 
     def factory(self, file):
 
@@ -35,39 +35,45 @@ def get_add_source(user, source_type_name, source_type_id):
     return source
 
 
-# TODO check efficiency of this function
-def remove_existing(new_transactions):
-    if len(new_transactions) is 0:
-        return new_transactions
+def rule_applies(rule, transaction):
 
-    without_duplicates = []
-    for transaction in new_transactions:
+    if rule.value is not None:
+        if not (rule.value.lower() in transaction.merchant.lower() or rule.value.lower() in transaction.comment.lower()):
+            return False
 
-        found = Transaction.objects \
-            .filter(owner=transaction.owner) \
-            .filter(comment=transaction.comment)\
-            .filter(merchant=transaction.merchant)\
-            .filter(amount=transaction.amount)\
-            .filter(source=transaction.source)\
-            .filter(date=transaction.date)
+    if rule.source is not None:
+        if transaction.source != rule.source:
+            return False
 
-        if len(found) == 0:
-            without_duplicates.append(transaction)
+    if rule.amount is not None:
+        if transaction.amount != rule.amount:
+            return False
 
-    return without_duplicates
+    if rule.day is not None:
+        if transaction.date.day != rule.day:
+            return False
 
-
-def rule_applies(rule, merchant, comment):
-    #if rule.rule_type.text == ANYTEXT_CONTAINS_RULE_TEXT:
-    if rule.value.lower() in merchant.lower() or rule.value.lower() in comment.lower():
-        return rule.subCategory
+    return True
 
 
-def get_subcategory(user, merchant, comment):
-    rules = Rule.objects.filter(owner=user)
-    for rule in rules:
-        if rule_applies(rule, merchant, comment):
+# return None means delete
+def get_subcategory(transaction):
+    all_rules = Rule.objects.filter(owner=transaction.owner)
+    for rule in all_rules:
+        if rule_applies(rule, transaction=transaction):
             return rule.subCategory
 
-    untagged_subcategory = SubCategory.objects.get(owner=user, text=UNTAGGED_SUBCATEGORY_TEXT)
+    untagged_subcategory = get_untagged_subcategory(transaction.owner)
     return untagged_subcategory
+
+
+def create_transaction(comment, merchant, date, amount, source, user):
+    transaction = Transaction(comment=comment, merchant=merchant.replace('\'', ''), date=date, amount=amount,
+                              source=source, subcategory=None, owner=user)
+
+    subcategory = get_subcategory(transaction)
+    if subcategory is not None:
+        transaction.subcategory = subcategory
+        return transaction
+    else:
+        return None

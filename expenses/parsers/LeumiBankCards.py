@@ -1,10 +1,9 @@
 from datetime import datetime
+import sys
 
 from bs4 import BeautifulSoup
 
-from expenses.models import Transaction
-import pandas as pd
-from .abstract import get_add_source, get_subcategory
+from .abstract import get_add_source, create_transaction
 
 
 class LeumiBankCardsParser(object):
@@ -38,16 +37,14 @@ class LeumiBankCardsParser(object):
                     card = cols[3].get_text()
                     source = get_add_source(user=user, source_type_name=card, source_type_id='')
 
-                    subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
-                    if subcategory is not None:
-                        transaction = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount,
-                        source=source,
-                        subcategory=subcategory, user=user)
-
+                    transaction = create_transaction(comment=comment, merchant=merchant, date=date, amount=amount,
+                                                     source=source, user=user)
+                    if transaction is not None:
                         transactions.append(transaction)
 
         except Exception as e:
-                return None
+            sys.stderr.write(e)
+            return None
 
         return transactions
 

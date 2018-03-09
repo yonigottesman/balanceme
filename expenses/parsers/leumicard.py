@@ -1,9 +1,9 @@
 from datetime import datetime
-
+import sys
 import pandas as pd
 
-from expenses.models import Transaction
-from expenses.parsers.abstract import get_add_source, get_subcategory
+
+from expenses.parsers.abstract import get_add_source, create_transaction
 
 
 class LeumicardParser(object):
@@ -24,16 +24,14 @@ class LeumicardParser(object):
                     comment = str(row['הערות'])
                 amount = float(row['סכום חיוב ₪'])
 
-
-                subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
-                if subcategory is not None:
-                    transaction = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount,
-                                                     source=source,
-                                                     subcategory=subcategory, user=user)
+                transaction = create_transaction(comment=comment, merchant=merchant, date=date, amount=amount,
+                                                 source=source, user=user)
+                if transaction is not None:
                     transactions.append(transaction)
 
             return transactions
         except Exception as e:
+            sys.stderr.write(e)
             return None
 
     def is_me(self, file):

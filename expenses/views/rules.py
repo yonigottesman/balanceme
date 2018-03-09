@@ -3,8 +3,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from expenses.common import ANYTEXT_CONTAINS_RULE_TEXT
-from expenses.models import SubCategory, RuleType, Rule, Transaction
+from expenses.common import get_untagged_subcategory
+from expenses.models import SubCategory, RuleType, Rule, Transaction, InputSource
 
 
 def rules(request):
@@ -21,24 +21,59 @@ def rules_add(request):
     try:
         value = request.POST['value']
         move_to = request.POST['subcategory_id']
+        source = request.POST['source_id']
+        amount = request.POST['amount']
+        day = request.POST['day']
         subcategory = None
         if move_to != 'delete':
             subcategory = SubCategory.objects.get(owner=request.user, pk=move_to)
+        if amount == '':
+            amount = None
+        else:
+            amount = float(amount)
+
+        if source == 'Any':
+            source = None
+        else:
+            source = InputSource.objects.get(pk=source, owner=request.user)
+
+        if day == '0':
+            day = None
+        else:
+            day = int(day)
+
+        if value == '':
+            value = None
+
         # rule_type = RuleType.objects.get(pk=request.POST['rule_type_id'])
     except (KeyError, SubCategory.DoesNotExist) as e:
         return render(request, 'expenses/categories', {'error_message': "All fields mandatory",})
     else:
 
-        new_rule = Rule(owner=request.user, rule_type=None, subCategory=subcategory, value=value)
+        new_rule = Rule(owner=request.user, rule_type=None, subCategory=subcategory, value=value,
+                        source=source, amount=amount, day=day)
         new_rule.save()
         apply_rule(new_rule, request.user)
         return HttpResponseRedirect(reverse('expenses:rules'))
 
 
 def apply_rule(rule, user):
-    # if rule.rule_type.text == ANYTEXT_CONTAINS_RULE_TEXT:
-    transactions = Transaction.objects.filter(owner=user)\
-        .filter(Q(merchant__icontains=rule.value) | Q(comment__icontains=rule.value))
+
+    transactions = Transaction.objects.filter(owner=user)
+
+    if rule.value is not None:
+        transactions = transactions.filter(Q(merchant__icontains=rule.value) | Q(comment__icontains=rule.value))
+
+    if rule.source is not None:
+        transactions = transactions.filter(source=rule.source)
+
+    if rule.amount is not None:
+        transactions = transactions.filter(amount=rule.amount)
+
+    if rule.day is not None:
+        transactions = transactions.filter(date__day=rule.day)
+
+
     for transaction in transactions:
         if rule.subCategory is None:
             transaction.delete()

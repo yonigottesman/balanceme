@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-
 class Category(models.Model):
     text = models.CharField(max_length=200)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -37,11 +36,6 @@ class Transaction(models.Model):
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    @classmethod
-    def create(cls, comment, merchant, date, amount, source, subcategory, user):
-        return Transaction(comment=comment, merchant=merchant.replace('\'', ''), date=date, amount=amount,
-                           source=source, subcategory=subcategory, owner=user)
-
     def __str__(self):
         return self.merchant
 
@@ -55,9 +49,12 @@ class RuleType(models.Model):
 
 class Rule(models.Model):
     rule_type = models.ForeignKey(RuleType, on_delete=models.CASCADE, null=True)
-    value = models.CharField(max_length=200)
+    value = models.CharField(max_length=200, null=True)
     subCategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    source = models.ForeignKey(InputSource, on_delete=models.CASCADE, null=True)
+    amount = models.FloatField(null=True)
+    day = models.IntegerField(null=True)
 
     def apply(self, transaction):
         pass

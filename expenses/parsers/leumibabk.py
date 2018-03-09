@@ -1,10 +1,10 @@
 from datetime import datetime
+import sys
 
 from bs4 import BeautifulSoup
 
-from expenses.models import Transaction
-import pandas as pd
-from .abstract import get_add_source, get_subcategory
+
+from .abstract import get_add_source, create_transaction
 
 
 class LeumiBankParser(object):
@@ -21,9 +21,8 @@ class LeumiBankParser(object):
             html = file.read()
             parsed_html = BeautifulSoup(html, "html.parser")
             source_type_name = 'Leumi Bank'
-            source_type_id = \
-            parsed_html.find_all(class_="exportDataFilterForPrint")[0].find_all('tr')[0].find_all('td')[0].find_all(
-                'span')[6].get_text()
+            source_type_id = parsed_html.find_all(class_="exportDataFilterForPrint")[0].find_all('tr')[0]\
+                .find_all('td')[0].find_all('span')[6].get_text()
             source = get_add_source(user=user, source_type_name=source_type_name, source_type_id=source_type_id)
 
             transactions = []
@@ -35,7 +34,7 @@ class LeumiBankParser(object):
                 if amount == '':
                     continue
                 else:
-                    amount = float(amount.replace(',',''))
+                    amount = float(amount.replace(',', ''))
 
                 date = row.find_all(class_='ExtendedActivityColumnDate')[0].get_text().strip()
                 date = datetime.strptime(date, '%d/%m/%y')
@@ -45,18 +44,16 @@ class LeumiBankParser(object):
                     merchant = row.find_all(class_='ActivityTableColumn1')[0].find_all('a')[0].get_text().strip()
                 else:
                     merchant = merchant[0].get_text().strip()
-
                 comment = ''
 
-                subcategory = get_subcategory(user=user, comment=comment, merchant=merchant)
-                if subcategory is not None:
-                    transaction = Transaction.create(comment=comment, merchant=merchant, date=date, amount=amount,
-                    source=source,
-                    subcategory=subcategory, user=user)
-
+                transaction = create_transaction(comment=comment, merchant=merchant, date=date, amount=amount,
+                                                 source=source, user=user)
+                if transaction is not None:
                     transactions.append(transaction)
+
         except Exception as e:
-                return None
+            sys.stderr.write(e)
+            return None
 
         return transactions
 
