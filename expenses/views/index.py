@@ -15,6 +15,7 @@ from django.core.paginator import Paginator
 from datetime import datetime
 
 
+
 def filter_index(request):
     try:
         start_date = request.POST['startDate']
@@ -48,6 +49,7 @@ def index(request):
     search = request.GET.get('search')
     category_id = request.GET.get('category')
     subcategory_id = request.GET.get('subcategory')
+    sort_by = request.GET.get('sort_by')
 
     transaction_list = Transaction.objects.filter(owner=request.user)
 
@@ -68,12 +70,24 @@ def index(request):
         subcategory = SubCategory.objects.get(owner=request.user, pk=subcategory_id)
         transaction_list = transaction_list.filter(subcategory=subcategory)
 
-    transaction_list = transaction_list.order_by('-date')
+    if sort_by == 'amount':
+        transaction_list = transaction_list.order_by('-amount')
+    if sort_by == 'date' or sort_by == 'None' or sort_by is None:
+        transaction_list = transaction_list.order_by('-date')
+    if sort_by == 'merchant':
+        transaction_list = transaction_list.order_by('-merchant')
+    if sort_by == 'comment':
+        transaction_list = transaction_list.order_by('-comment')
+    if sort_by == 'subcategory':
+        transaction_list = transaction_list.order_by('-subcategory')
+    if sort_by == 'source':
+        transaction_list = transaction_list.order_by('-source')
 
     paginator = Paginator(transaction_list, 15) # Show 25 contacts per page
     page = request.GET.get('page')
     transactions = paginator.get_page(page)
     input_source_list = InputSource.objects.filter(owner=request.user)
+
     context = {'transactions':  transactions,
                'startDate': start_date, 'endDate': end_date,
                'inputSources': input_source_list,
@@ -83,6 +97,7 @@ def index(request):
                'category': category_id,
                'subcategory': subcategory_id,
                'subcategories': SubCategory.objects.filter(owner=request.user).order_by('text'),
+               'sort_by': sort_by
                }
 
     return render(request, 'expenses/index.html', context)
@@ -103,6 +118,7 @@ def index_action(request):
     category = request.POST['category']
     current_subcategory = request.POST['subcategory']
     page = request.POST['page']
+    sort_by = request.POST['sort_by']
 
     if request.POST['action'] == 'delete':
         for marked in marked_transactions:
@@ -118,7 +134,7 @@ def index_action(request):
             transaction.save()
 
     url = reverse('expenses:index') + "?startDate=" + start_date + "&endDate=" + end_date + '&source=' + source \
-          + '&search' + search + '&category=' + category + '&subcategory=' + str(current_subcategory) + '&page='+page
+          + '&search' + search + '&category=' + category + '&subcategory=' + str(current_subcategory) + '&page='+page + '&sort_by='+sort_by
     return HttpResponseRedirect(url)
 
 

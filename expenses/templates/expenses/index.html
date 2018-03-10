@@ -187,6 +187,7 @@
     <input name="category" type="hidden" value="{{category}}" />
     <input name="subcategory" type="hidden" value="{{subcategory}}" />
     <input name="page" type="hidden" value="{{transactions.number }}" />
+    <input name="sort_by" type="hidden" value="{{sort_by}}" />
 
     <div class="row">
       <div class="actions">
@@ -213,12 +214,14 @@
           <tr>
 
             <th><input type="checkbox" onClick="toggle(this)" /></th>
-            <th scope="col">Date</th>
-            <th scope="col">Merchant</th>
-            <th scope="col">Amount</th>
-            <th scope="col">Comment</th>
-            <th scope="col">Subcategory</th>
-            <th scope="col">Source</th>
+            <th scope="col"><a href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by=date">Date</a></th>
+            <th scope="col"><a href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by=merchant">Merchant</a></th>
+      
+            <th scope="col"><a href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by=amount">Amount</a></th>
+            <th scope="col"><a href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by=Comment">Comment</a></th>
+            <th scope="col"><a href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by=subcategory">Subcategory</a></th>
+            <th scope="col"><a href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by=source">Source</a></th>
+
           </tr>
         </thead>
         <tbody>
@@ -268,11 +271,11 @@
       {% if transactions.has_previous %}
 
       <li class="page-item">
-        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}" tabindex="-1">First</a>
+        <a class="page-link" href="?page=1&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by={{sort_by}}" tabindex="-1">First</a>
       </li>
       
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}" tabindex="-1">Previous</a>
+        <a class="page-link" href="?page={{ transactions.previous_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by={{sort_by}}" tabindex="-1">Previous</a>
       </li>
 
       {% else %}
@@ -288,11 +291,11 @@
       
       {% if transactions.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}">Next</a>
+        <a class="page-link" href="?page={{ transactions.next_page_number }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by={{sort_by}}">Next</a>
       </li>
 
       <li class="page-item">
-        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}">Last</a>
+        <a class="page-link" href="?page={{ transactions.paginator.num_pages }}&startDate={{startDate}}&endDate={{endDate}}&source={{source}}&search={{search}}&category={{category}}&subcategory={{subcategory}}&sort_by={{sort_by}}">Last</a>
       </li>
       
       {% else %}
