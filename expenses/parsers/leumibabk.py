@@ -52,7 +52,7 @@ class LeumiBankParser(object):
                     transactions.append(transaction)
 
         except Exception as e:
-            sys.stderr.write(e)
+            sys.stderr.write(str(e))
             return None
 
         return transactions

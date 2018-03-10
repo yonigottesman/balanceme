@@ -26,8 +26,8 @@ class VisaCalParser(object):
             return None
 
         merchant = splits[1]
-        amount = splits[3].split("₪")[0].replace(',','')
-
+        amount = splits[3].replace("₪", '').replace(',', '').strip()
+        
         if '-' in amount:
             amount = '-' + amount.replace('-','')
         amount = float(amount)
@@ -56,7 +56,7 @@ class VisaCalParser(object):
             return transactions
 
         except Exception as e:
-            sys.stderr.write(e)
+            sys.stderr.write(str(e))
             return None
 
 

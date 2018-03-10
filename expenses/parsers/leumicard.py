@@ -31,7 +31,7 @@ class LeumicardParser(object):
 
             return transactions
         except Exception as e:
-            sys.stderr.write(e)
+            sys.stderr.write(str(e))
             return None
 
     def is_me(self, file):
