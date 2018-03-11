@@ -1,1 +1,10 @@
 # balanceme
+## Local Mode
+git clone https://github.com/yonigottesman/balanceme.git
+cd balanceme
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 manage.py migrate
+python3 mange.py runserver
+
