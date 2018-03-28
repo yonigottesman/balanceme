@@ -40,7 +40,8 @@ class MastercardParser(object):
     def is_me(self, file):
         try:
             table = pd.read_excel(file).to_dict('records')
-            if 'מסטרקארד' in table[1][(list(table[1].keys())[0])]:
+            if 'מסטרקארד' in table[1][(list(table[1].keys())[0])] or \
+                            'קורפוריט - זהב' in table[1][(list(table[1].keys())[0])]:
                 card_number = table[1][(list(table[1].keys())[0])].split(' ')[-1]
                 return True
             else:
