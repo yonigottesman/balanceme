@@ -77,17 +77,32 @@ def stats_category(request, category):
     total_sum = 0
     pie_chart = pygal.Pie(Config)
 
-    for subcategory, subcategory_list in groupby(transactions, lambda x: x.subcategory):
+    subcategory_sum = {}
+    for transaction in transactions:
+        if transaction.subcategory in subcategory_sum:
+            subcategory_sum[transaction.subcategory] = subcategory_sum[transaction.subcategory] + transaction.amount
+        else:
+            subcategory_sum[transaction.subcategory] = transaction.amount
 
-        subcategory_sum = sum([tx.amount for tx in subcategory_list])
-        total_sum = total_sum + subcategory_sum
+    for sc in subcategory_sum:
+        total_sum = total_sum + subcategory_sum[sc]
+        url = request.build_absolute_uri(reverse('expenses:index') + url_params + '&subcategory=' + str(sc.id))
 
-        url = request.build_absolute_uri(reverse('expenses:index') + url_params + '&subcategory=' + str(subcategory.id))
+        pie_chart.add(sc.text, [{'value': subcategory_sum[sc],
+                                          'xlink': {'href': url, 'target': '_top'}}])
 
-        pie_chart.add(subcategory.text, [{'value':subcategory_sum,
-                                                'xlink': {'href': url, 'target': '_top'}}])
 
-    pie_chart.title = subcategory.text + '\nTotal ' + str('{:20,d}'.format(int(total_sum))) + "₪"
+    # for subcategory, subcategory_list in groupby(transactions, lambda x: x.subcategory):
+    #
+    #     subcategory_sum = sum([tx.amount for tx in subcategory_list])
+    #     total_sum = total_sum + subcategory_sum
+    #
+    #     url = request.build_absolute_uri(reverse('expenses:index') + url_params + '&subcategory=' + str(subcategory.id))
+    #
+    #     pie_chart.add(subcategory.text, [{'value':subcategory_sum,
+    #                                             'xlink': {'href': url, 'target': '_top'}}])
+
+    pie_chart.title = category.text + '\nTotal ' + str('{:20,d}'.format(int(total_sum))) + "₪"
 
     pie_chart.render()
     pie_chart = pie_chart.render_data_uri()
